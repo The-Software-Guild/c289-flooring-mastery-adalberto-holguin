@@ -15,6 +15,6 @@ public class App {
         appContext.refresh();
 
         FlooringMasteryController controller = appContext.getBean("flooringMasteryController", FlooringMasteryController.class);
-
+        controller.run();
     }
 }
