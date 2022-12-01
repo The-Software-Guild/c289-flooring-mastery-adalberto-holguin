@@ -14,7 +14,7 @@ public class App {
         appContext.scan("com.sg.assessment");
         appContext.refresh();
 
-        FlooringMasteryController controller = appContext.getBean("controller", FlooringMasteryController.class);
+        FlooringMasteryController controller = appContext.getBean("flooringMasteryController", FlooringMasteryController.class);
 
     }
 }

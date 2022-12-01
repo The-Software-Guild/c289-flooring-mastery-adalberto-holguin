@@ -10,12 +10,6 @@ import java.math.BigDecimal;
 @Component
 public interface FlooringMasteryService {
 
-    private FlooringMasteryDao;
-
-    @Autowired
-    public FlooringMasteryService(FlooringMasteryDao dao) {
-        this.dao = dao;
-    }
 
     BigDecimal calculateMaterialCost(BigDecimal area, BigDecimal costPerSquareFoot);
     BigDecimal calculateLaborCost(BigDecimal area, BigDecimal laborCostPerSquareFoot);
