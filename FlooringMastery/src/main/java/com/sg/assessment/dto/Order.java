@@ -1,4 +1,4 @@
-package com.sg.assessment.model;
+package com.sg.assessment.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -6,6 +6,7 @@ import java.time.LocalDate;
 public class Order {
 
     private int orderNumber;
+    private LocalDate date;
     private String customerName;
     private String state;
     private BigDecimal taxRate;
@@ -39,7 +40,9 @@ public class Order {
     }
 
     //for creating a new order in dao
-    public Order(String customerName, String state, String productType, BigDecimal area) {
+    public Order(int orderNumber, String customerName, String state,
+                 String productType, BigDecimal area) {
+        this.orderNumber = orderNumber;
         this.customerName = customerName;
         this.state = state;
         this.productType = productType;
@@ -51,6 +54,14 @@ public class Order {
 
     public void setOrderNumber(int orderNumber) {
         this.orderNumber = orderNumber;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 
     public String getCustomerName() {
@@ -140,4 +151,6 @@ public class Order {
     public void setTotal(BigDecimal total) {
         this.total = total;
     }
+
+
 }
