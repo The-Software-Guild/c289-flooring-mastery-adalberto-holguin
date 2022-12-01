@@ -2,13 +2,24 @@ package com.sg.assessment.controller;
 
 import com.sg.assessment.dao.FlooringMasterDaoFileImpl;
 import com.sg.assessment.dao.FlooringMasteryDao;
+import com.sg.assessment.service.FlooringMasteryService;
 import com.sg.assessment.view.FlooringMasteryView;
 import com.sg.assessment.view.UserIO;
 import com.sg.assessment.view.UserIOConsoleImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class FlooringMasteryController {
 
+    private FlooringMasteryService service;
     private FlooringMasteryView view;
+
+    @Autowired
+    public FlooringMasteryController(FlooringMasteryService service, FlooringMasteryView view) {
+        this.service = service;
+        this.view = view;
+    }
     private FlooringMasteryDao dao;
 
     public FlooringMasteryController(FlooringMasteryDao dao, FlooringMasteryView view) {

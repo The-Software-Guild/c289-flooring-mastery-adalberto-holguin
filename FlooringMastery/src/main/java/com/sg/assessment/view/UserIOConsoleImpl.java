@@ -1,8 +1,12 @@
 package com.sg.assessment.view;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Scanner;
 
+@Component
 public class UserIOConsoleImpl implements UserIO {
+
 
     @Override
     public void print(String message) {
