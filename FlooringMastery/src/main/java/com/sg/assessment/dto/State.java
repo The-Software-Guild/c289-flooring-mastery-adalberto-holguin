@@ -1,4 +1,4 @@
-package com.sg.assessment.model;
+package com.sg.assessment.dto;
 
 import java.math.BigDecimal;
 

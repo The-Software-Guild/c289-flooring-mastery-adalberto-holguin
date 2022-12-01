@@ -1,75 +1,113 @@
 package com.sg.assessment.dao;
 
-<<<<<<< HEAD
-import com.sg.assessment.model.Order;
+import com.sg.assessment.dto.Order;
 
 import java.io.*;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-=======
+import com.sg.assessment.dto.Product;
+import com.sg.assessment.dto.State;
 import org.springframework.stereotype.Component;
 
 @Component
->>>>>>> main
 public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
 
-    private final String CURRENT_FILE;
+    private String CURRENT_ORDERS;
+    private String STATE_FILE;
+    private String PRODUCT_FILE;
     public static final String DELIMITER = ",";
-    private  Map<Integer, Order> orders = new HashMap<>();
+
+
+    private Map<Integer, Order> ordersList = new HashMap<>();
+    private List<State> statesList = new ArrayList<>();
+    private List<Product> productsList = new ArrayList<>();
 
     public FlooringMasterDaoFileImpl() {
-        CURRENT_FILE = "default.txt";
+        CURRENT_ORDERS = "default.txt";
+        STATE_FILE = "Taxes.txt";
+        PRODUCT_FILE = "Products.txt";
     }
 
     public FlooringMasterDaoFileImpl(String currentTextFile) {
-        CURRENT_FILE = currentTextFile;
+        CURRENT_ORDERS = currentTextFile;
     }
 
-    //factory method
-    public FlooringMasterDaoFileImpl basedOnDate(LocalDate date) {
-        //if file already exists, don't create new file
-        //if file does not exist, create a new order file under Orders folder
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMddYYY");
-        String fileName = "Order_" + date.format(formatter) + ".txt";
+    //adding setter to be able to switch between different files
+    //file param will have date in the file name
+    public void setCurrentFile(String fileName) {
+        File checkFile = new File(".\\orders\\" + fileName);
+        if (checkFile.exists()) {
+            CURRENT_ORDERS = fileName;
+        } else {
+            createNewOrdersFile(fileName);
+            CURRENT_ORDERS = fileName;
+        }
 
-        //create a file with fileName
+    }
 
-        //instantiate a dao with that new file
-        FlooringMasterDaoFileImpl dao = new FlooringMasterDaoFileImpl();
-        return dao;
+    private File createNewOrdersFile(String fileName) {
+        File newFile = new File(".\\orders\\" + fileName);
+        try {
+            newFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return newFile;
     }
 
     //check by date?
     @Override
-    public List<Order> getAllOrders() throws UnsupportedOperationException {
-        loadFile();
-        return new ArrayList<>(orders.values());
+    public List<Order> getOrdersList() throws UnsupportedOperationException {
+        return new ArrayList<Order>(ordersList.values());
     }
 
     @Override
-    public Order addOrder(LocalDate date, String customerName, String state, String productType, BigDecimal area) throws UnsupportedOperationException {
-        loadFile();
-        //set a date
-        Order newOrder = new Order(customerName, state, productType, area);
+    public List<State> getStatesList() {
+        return statesList;
+    }
+
+    @Override
+    public List<Product> getProductsList() {
+        return productsList;
+    }
+
+    @Override
+    public Order addOrder(String customerName, String state, String productType, BigDecimal area) throws UnsupportedOperationException {
+        loadOrdersFile();
+        //get previous order for order number
+        Order previousOrder = orders.get(orders.size() - 1);
+        int prevOrderNumber = previousOrder.getOrderNumber();
+
+        //creating a new order from required props
+        Order newOrder = new Order(prevOrderNumber + 1, customerName, state, productType, area);
+
         return newOrder;
     }
 
-
     @Override
     public Order getOrder(int orderNumber) throws UnsupportedOperationException {
-        loadFile();
+        loadOrdersFile();
         return orders.get(orderNumber);
     }
 
     @Override
-    public Order removeOrder(int orderNumber) throws UnsupportedOperationException {
-        loadFile();
-        Order removedOrder = orders.remove(orderNumber);
-        writeFile();
-        return removedOrder;
+    public Order removeOrder(Order chosenOrder) throws UnsupportedOperationException {
+
+        int orderNumber = chosenOrder.getOrderNumber();
+
+        List<Order> order = loadOrders(chosenOrder.getDate());
+        Order removedOrder = orders.stream()
+                .filter(o -> o.getOrderNumber() == orderNumber)
+                .findFirst().orElse(null);
+        if (removedOrder != null) {
+            order.remove(removedOrder);
+            writeOrders(orders, chosenOrder.getDate());
+            return removedOrder;
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -81,16 +119,8 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         orderToEdit.setState(newState);
         orderToEdit.setProductType(newProductType);
         orderToEdit.setArea(newArea);
-        writeFile();
+        writeOrdersFile();
     }
-//
-//    private File getFile(LocalDate date) {
-//        return new File("");
-//    }
-//
-//    private File createFile(LocalDate date) {
-//        return new File("");
-//    }
 
     private Order unmarshallOrder(String orderAsText) {
         String[] orderTokens = orderAsText.split(DELIMITER);
@@ -111,22 +141,82 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         return currentOrder;
     }
 
-    private void loadFile() throws UnsupportedOperationException {
+    private State unmarshallState(String stateAsText) {
+        String[] stateTokens = stateAsText.split(DELIMITER);
+        State currentState = new State();
+        currentState.setStateAbbreviation(stateTokens[0]);
+        currentState.setStateName(stateTokens[1]);
+        currentState.setTaxRate(new BigDecimal(stateTokens[2]));
+
+        return currentState;
+    }
+
+    private Product unmarshallProduct(String productText) {
+        String[] productToken = productText.split(DELIMITER);
+        Product product = new Product();
+        product.setProductType(productToken[0]);
+        product.setCostPerSquareFoot(new BigDecimal(productToken[1]));
+        product.setCostPerSquareFoot(new BigDecimal(productToken[2]));
+
+        return product;
+    }
+
+    private void loadOrdersFile() throws UnsupportedOperationException {
         Scanner scanner;
         try {
             scanner = new Scanner(
                     new BufferedReader(
-                            new FileReader(CURRENT_FILE)));
+                            new FileReader(CURRENT_ORDERS)));
         } catch (FileNotFoundException e) {
             throw new UnsupportedOperationException("Could not load file into memory.");
         }
 
         String currentLine;
         Order currentOrder;
-        while(scanner.hasNextLine()) {
+        while (scanner.hasNextLine()) {
             currentLine = scanner.nextLine();
             currentOrder = unmarshallOrder(currentLine);
             orders.put(currentOrder.getOrderNumber(), currentOrder);
+        }
+        scanner.close();
+    }
+
+    private void loadStateFile() {
+        Scanner scanner;
+        try {
+            scanner = new Scanner(
+                    new BufferedReader(
+                            new FileReader(STATE_FILE)));
+        } catch (FileNotFoundException e) {
+            throw new UnsupportedOperationException("Could not load file into memory.");
+        }
+
+        String currentLine;
+        State currentState;
+        while (scanner.hasNextLine()) {
+            currentLine = scanner.nextLine();
+            currentState = unmarshallState(currentLine);
+            statesList.add(currentState);
+        }
+        scanner.close();
+    }
+
+    private void loadProductFile() throws UnsupportedOperationException {
+        Scanner scanner;
+        try {
+            scanner = new Scanner(
+                    new BufferedReader(
+                            new FileReader(PRODUCT_FILE)));
+        } catch (FileNotFoundException e) {
+            throw new UnsupportedOperationException("Could not load file into memory.");
+        }
+
+        String currentLine;
+        Product currentProduct;
+        while (scanner.hasNextLine()) {
+            currentLine = scanner.nextLine();
+            currentProduct = unmarshallProduct(currentLine);
+            productsList.add(currentProduct);
         }
         scanner.close();
     }
@@ -148,17 +238,17 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         return orderAsText;
     }
 
-    private void writeFile() throws UnsupportedOperationException {
+    private void writeOrdersFile() throws UnsupportedOperationException {
         PrintWriter out;
         try {
-            out = new PrintWriter(new FileWriter(CURRENT_FILE));
+            out = new PrintWriter(new FileWriter(CURRENT_ORDERS));
         } catch (IOException e) {
             throw new UnsupportedOperationException();
         }
 
         String orderAsText;
         List<Order> orderList = this.getAllOrders();
-        for(Order order: orderList) {
+        for (Order order : orderList) {
             orderAsText = marshallOrder(order);
             out.println(orderAsText);
             out.flush();
@@ -166,6 +256,5 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
 
         out.close();
     }
-
 
 }
