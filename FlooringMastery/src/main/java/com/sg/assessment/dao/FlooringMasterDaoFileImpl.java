@@ -1,5 +1,6 @@
 package com.sg.assessment.dao;
 
+<<<<<<< HEAD
 import com.sg.assessment.model.Order;
 
 import java.io.*;
@@ -8,6 +9,11 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+=======
+import org.springframework.stereotype.Component;
+
+@Component
+>>>>>>> main
 public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
 
     private final String CURRENT_FILE;

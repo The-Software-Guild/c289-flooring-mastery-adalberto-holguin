@@ -10,6 +10,8 @@ public interface UserIO {
 
     String readStringNoEmpty(String prompt);
 
+    BigDecimal readBigdecimal(String prompt);
+
     int readInt(String prompt);
 
     int readInt(String prompt, int min, int max);
