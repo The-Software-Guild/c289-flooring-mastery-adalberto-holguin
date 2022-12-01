@@ -1,6 +1,7 @@
 package com.sg.assessment.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class Order {
 
@@ -37,6 +38,13 @@ public class Order {
         this.total = total;
     }
 
+    //for creating a new order in dao
+    public Order(String customerName, String state, String productType, BigDecimal area) {
+        this.customerName = customerName;
+        this.state = state;
+        this.productType = productType;
+        this.area = area;
+    }
     public int getOrderNumber() {
         return orderNumber;
     }
