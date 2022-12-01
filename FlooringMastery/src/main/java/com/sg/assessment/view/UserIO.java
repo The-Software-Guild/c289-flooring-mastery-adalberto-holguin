@@ -8,9 +8,11 @@ public interface UserIO {
 
     String readString(String prompt);
 
+    String readString(String prompt, int max);
+
     String readStringNoEmpty(String prompt);
 
-    BigDecimal readBigdecimal(String prompt);
+    String formatCurrency(BigDecimal amount);
 
     int readInt(String prompt);
 
@@ -27,4 +29,8 @@ public interface UserIO {
     long readLong(String prompt);
 
     long readLong(String prompt, long min, long max);
+
+    BigDecimal readBigDecimal(String prompt);
+
+    BigDecimal readBigDecimal(String prompt, BigDecimal min, BigDecimal max);
 }

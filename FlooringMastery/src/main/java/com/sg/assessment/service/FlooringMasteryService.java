@@ -1,18 +1,46 @@
 package com.sg.assessment.service;
 
-import com.sg.assessment.dao.FlooringMasteryDao;
-import com.sg.assessment.model.State;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.sg.assessment.dto.Order;
+import com.sg.assessment.dto.Product;
+import com.sg.assessment.dto.State;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public interface FlooringMasteryService {
 
+    Order addOrderBasedOnDate(LocalDate date, int orderNumber, String customerName, String state, String productType, BigDecimal area)
+            throws UnsupportedOperationException;
 
-    BigDecimal calculateMaterialCost(BigDecimal area, BigDecimal costPerSquareFoot);
-    BigDecimal calculateLaborCost(BigDecimal area, BigDecimal laborCostPerSquareFoot);
-    BigDecimal calculateTax(BigDecimal materialCost, BigDecimal laborCost, State state);
-    BigDecimal calculateTotal(BigDecimal materialCost, BigDecimal laborCost, BigDecimal tax);
+    void calculatePricesAndStoreOrder(Order order, LocalDate orderDate);
+
+    BigDecimal calculateMaterialCost(Order order, BigDecimal area, BigDecimal costPerSquareFoot);
+
+    BigDecimal calculateLaborCost(Order order, BigDecimal area, BigDecimal laborCostPerSquareFoot);
+
+    BigDecimal calculateTax(Order order, BigDecimal materialCost, BigDecimal laborCost, String stateAbbr);
+
+    BigDecimal calculateTotal(Order order, BigDecimal materialCost, BigDecimal laborCost, BigDecimal tax);
+
+    void selectOrdersFile(LocalDate date);
+
+    List<Order> retrieveOrdersList();
+
+    List<State> retrieveStatesList();
+
+    List<Product> retrieveProductsList();
+
+    List<Order> getOrders(LocalDate dateChoice)
+        throws UnsupportedOperationException;
+
+    Order getOrder(LocalDate dateChoice, int orderNumber)
+        throws UnsupportedOperationException;
+
+    Order removeOrder(Order removedOrder)
+            throws UnsupportedOperationException;
+
 }
+

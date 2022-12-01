@@ -3,6 +3,7 @@ package com.sg.assessment.view;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Scanner;
 
 @Component
@@ -22,6 +23,21 @@ public class UserIOConsoleImpl implements UserIO {
     }
 
     @Override
+    public String readString(String prompt, int max) {
+        boolean valid = false;
+        String result = "";
+        do {
+            result = readString(prompt);
+            if (result.length() <= max) {
+                valid = true;
+            } else {
+                System.out.printf("The entry must be %s letters or less. /n", max);
+            }
+        } while (!valid);
+        return result;
+    }
+
+    @Override
     public String readStringNoEmpty(String prompt) {
         Scanner inputReader = new Scanner(System.in);
         String returnString;
@@ -32,13 +48,6 @@ public class UserIOConsoleImpl implements UserIO {
             }
         } while (returnString.equals(""));
         return returnString.trim();
-    }
-
-    @Override
-    public BigDecimal readBigdecimal(String prompt) {
-        Scanner inputReader = new Scanner(System.in);
-        System.out.println(prompt);
-        return new BigDecimal(inputReader.nextLine());
     }
 
     @Override
@@ -123,5 +132,34 @@ public class UserIOConsoleImpl implements UserIO {
             }
         } while (num < min || num > max);
         return num;
+    }
+
+    @Override
+    public BigDecimal readBigDecimal(String prompt) {
+        Scanner inputReader = new Scanner(System.in);
+        System.out.println(prompt);
+        return new BigDecimal(inputReader.nextLine()).setScale(2, RoundingMode.HALF_EVEN);
+    }
+
+    @Override
+    public BigDecimal readBigDecimal(String prompt, BigDecimal min, BigDecimal max) {
+        Scanner inputReader = new Scanner(System.in);
+        BigDecimal num;
+
+        while (true) {
+            try {
+                do {
+                    System.out.println(prompt);
+                    num = new BigDecimal(inputReader.nextLine()).setScale(2, RoundingMode.HALF_EVEN);
+                    if (num.compareTo(min) == -1 || num.compareTo(max) == 1) {
+                        System.out.println("Invalid input, enter a number between " + min + " and " + max + ".");
+                    }
+                } while (num.compareTo(min) == -1 || num.compareTo(max) == 1);
+                return num;
+            } catch (NumberFormatException e) {
+                // If the user inputs something other than numbers
+                System.out.println("Invalid input, please only enter numbers.");
+            }
+        }
     }
 }

@@ -1,13 +1,15 @@
 package com.sg.assessment.dao;
 
-import com.sg.assessment.model.Order;
+import com.sg.assessment.dto.Order;
+import com.sg.assessment.dto.Product;
+import com.sg.assessment.dto.State;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 public interface FlooringMasteryDao {
 
+    void setCurrentFile(String fileName);
     /**
      * Returns a List of all Orders regardless of status.
      *
@@ -15,21 +17,16 @@ public interface FlooringMasteryDao {
      * @throws UnsupportedOperationException replace later
      */
 
-    List<Order> getAllOrders()
+    List<Order> getOrdersList()
             throws UnsupportedOperationException;
 
 
-    /**
-     * Adds an Order to the file and associates it with the given order number.
-     *
-     * @param orderNumber order number to be associated with Order.
-     * @param order order to be placed.
-     *
-     * @throws UnsupportedOperationException replace later
-     */
-
-    Order addOrder(LocalDate date, String customerName, String state, String productType, BigDecimal area)
+    Order addOrder(String customerName, String state, String productType, BigDecimal area)
             throws UnsupportedOperationException;
+
+    List<State> getStatesList();
+
+    List<Product> getProductsList();
 
     /**
      * Retrieves an Order from the file by its order number and returns it.
@@ -48,11 +45,12 @@ public interface FlooringMasteryDao {
      * Returns null if no such order exists.
      *
      * @param orderNumber order number to be associated with the order.
-     *
      * @throws UnsupportedOperationException replace later
      */
-    Order removeOrder(int orderNumber)
-            throws UnsupportedOperationException;
+    static Order removeOrder(Order o)
+            throws UnsupportedOperationException {
+        return null;
+    }
 
     /**
      * Edits properties for the order associated with the order number.
@@ -64,4 +62,48 @@ public interface FlooringMasteryDao {
     void editOrder(int orderNumber, String newCustomerName, String newState,
                    String newProductType, BigDecimal area)
             throws UnsupportedOperationException;
+//
+//    /**
+//     * Edits customer name for the order associated with the order number.
+//     *
+//     * @param orderNumber order number to be associated with the order.
+//     * @param newCustomerName new Customer name to replace old.
+//     *
+//     * @throws UnsupportedOperationException replace later
+//     */
+//    void editCustomerName(int orderNumber, String newCustomerName)
+//            throws UnsupportedOperationException;
+//
+//    /**
+//     * Edits state for the order associated with the order number.
+//     *
+//     * @param orderNumber order number to be associated with the order.
+//     * @param newState new state to replace old.
+//     *
+//     * @throws UnsupportedOperationException replace later
+//     */
+//    void editState(int orderNumber, String newState)
+//            throws UnsupportedOperationException;
+//
+//    /**
+//     * Edits the product type for the order associated with the order number.
+//     *
+//     * @param orderNumber order number to be associated with the order.
+//     * @param newProductType new product to replace old.
+//     *
+//     * @throws UnsupportedOperationException replace later
+//     */
+//    void editProductType(int orderNumber, String newProductType)
+//            throws UnsupportedOperationException;
+//
+//    /**
+//     * Edits customer name for the order associated with the order number.
+//     *
+//     * @param orderNumber order number to be associated with the order.
+//     * @param newArea new area to replace old.
+//     *
+//     * @throws UnsupportedOperationException replace later
+//     */
+//    void editArea(int orderNumber, BigDecimal newArea)
+//            throws UnsupportedOperationException;
 }
