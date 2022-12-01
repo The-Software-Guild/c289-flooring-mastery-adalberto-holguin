@@ -20,12 +20,7 @@ public class FlooringMasteryController {
         this.service = service;
         this.view = view;
     }
-    private FlooringMasteryDao dao;
 
-    public FlooringMasteryController(FlooringMasteryDao dao, FlooringMasteryView view) {
-        this.view = view;
-        this.dao = dao;
-    }
     private UserIO io = new UserIOConsoleImpl();
 
     public void run() {
