@@ -2,6 +2,7 @@ package com.sg.assessment.view;
 
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Scanner;
 
 @Component
@@ -31,6 +32,13 @@ public class UserIOConsoleImpl implements UserIO {
             }
         } while (returnString.equals(""));
         return returnString.trim();
+    }
+
+    @Override
+    public BigDecimal readBigdecimal(String prompt) {
+        Scanner inputReader = new Scanner(System.in);
+        System.out.println(prompt);
+        return new BigDecimal(inputReader.nextLine());
     }
 
     @Override
