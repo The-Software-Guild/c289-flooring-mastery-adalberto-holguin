@@ -18,7 +18,6 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
         this.dao = dao;
     }
 
-    // This is a test
     @Override
     public BigDecimal calculateMaterialCost(BigDecimal area, BigDecimal costPerSquareFoot) {
         return area.multiply(costPerSquareFoot).setScale(2, RoundingMode.HALF_EVEN);
