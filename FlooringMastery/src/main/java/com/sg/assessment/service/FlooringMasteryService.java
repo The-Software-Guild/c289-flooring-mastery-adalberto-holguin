@@ -12,10 +12,9 @@ import java.util.List;
 @Component
 public interface FlooringMasteryService {
 
-    Order addOrderBasedOnDate(LocalDate date, int orderNumber, String customerName, String state, String productType, BigDecimal area)
-            throws UnsupportedOperationException;
+    void enterOrder(Order order);
 
-    void calculatePricesAndStoreOrder(Order order, LocalDate orderDate);
+    Order calculatePrices(Order order);
 
     BigDecimal calculateMaterialCost(Order order, BigDecimal area, BigDecimal costPerSquareFoot);
 
@@ -25,7 +24,7 @@ public interface FlooringMasteryService {
 
     BigDecimal calculateTotal(Order order, BigDecimal materialCost, BigDecimal laborCost, BigDecimal tax);
 
-    void selectOrdersFile(LocalDate date);
+    void selectAndLoadOrdersFile(LocalDate date);
 
     List<Order> retrieveOrdersList();
 
@@ -33,10 +32,7 @@ public interface FlooringMasteryService {
 
     List<Product> retrieveProductsList();
 
-    List<Order> getOrders(LocalDate dateChoice)
-        throws UnsupportedOperationException;
-
-    Order getOrder(LocalDate dateChoice, int orderNumber)
+    Order retrieveOrder(LocalDate dateChoice, int orderNumber)
         throws UnsupportedOperationException;
 
     Order removeOrder(Order removedOrder)
