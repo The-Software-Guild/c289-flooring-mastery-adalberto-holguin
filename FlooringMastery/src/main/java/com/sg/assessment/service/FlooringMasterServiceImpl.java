@@ -27,7 +27,7 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
     @Override
     public void selectAndLoadOrdersFile(LocalDate date) {
         //date format is ensured when collected from user
-        String fileName = "Order_" + date + ".txt";
+        String fileName = "Orders_" + date + ".txt";
         dao.setCurrentFile(fileName);
     }
 
@@ -40,11 +40,15 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
     public Order calculatePrices(Order order) {
         BigDecimal materialCost = calculateMaterialCost(order, order.getArea(), order.getCostPerSquareFoot());
         BigDecimal laborCost = calculateLaborCost(order, order.getArea(), order.getLaborCostPerSquareFoot());
+
+        // These two change when user edits state
         BigDecimal tax = calculateTax(order, materialCost, laborCost, order.getState());
         BigDecimal total = calculateTotal(order, materialCost, laborCost, tax);
 
         order.setMaterialCost(materialCost);
         order.setLaborCost(laborCost);
+
+        // These two change when user edits state
         order.setTax(tax);
         order.setTotal(total);
 
