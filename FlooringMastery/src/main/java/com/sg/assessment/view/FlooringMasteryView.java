@@ -108,6 +108,26 @@ public class FlooringMasteryView {
         return order;
     }
 
+    public boolean confirmOrder(Order order) {
+        io.print("\nOrder Review");
+        io.print("\nOrder Number: " + order.getOrderNumber());
+        io.print("Customer Name: " + order.getCustomerName());
+        io.print("State: " + order.getState());
+        io.print("Product Type: " + order.getProductType());
+        io.print("Area: " + order.getArea() + " sq. ft.");
+        io.print("Material Cost: " + order.getMaterialCost());
+        io.print("Labor Cost: " + order.getLaborCost());
+        io.print("Tax: " + order.getTax());
+        io.print("Total: " + order.getTotal());
+
+        int userChoice = io.readInt("\nConfirm order placement     1) YES     2) NO", 1, 2);
+        if (userChoice == 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     //editorder //removeorder
     public String getdate() {
         String date = io.readString("Enter the order date");
