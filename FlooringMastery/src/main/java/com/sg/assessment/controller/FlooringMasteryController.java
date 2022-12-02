@@ -75,18 +75,29 @@ public class FlooringMasteryController {
 
     private void displayOrders() {
 
+
     }
 
     private void addOrder() {
         LocalDate orderDate = view.retrieveOrderDate(); // retrieves order date from user
+        service.selectAndLoadOrdersFile(orderDate); // assigning order to correct file
 
         List<Order> ordersList = service.retrieveOrdersList(); // so we can choose correct order number for new order
         List<State> statesList = service.retrieveStatesList(); // so we can show the user our states
         List<Product> productsList = service.retrieveProductsList(); // so we can show the user our products
         Order newOrder = view.retrieveOrderInformation(ordersList, statesList, productsList); // retrieves order info from user
         
-        // Calculates order's material cost, labor cost, tax, and total, and stores the order in respective file
-        service.calculatePricesAndStoreOrder(newOrder, orderDate);
+        // Calculates order's material cost, labor cost, tax, and total
+        service.calculatePrices(newOrder);
+
+        // Confirming user order
+        boolean orderIsConfirmed = view.confirmOrder(newOrder);
+        if (orderIsConfirmed) {
+            service.enterOrder(newOrder);
+            // message from view saying order entered
+        } else {
+            // message from view saying order aborted
+        }
     }
 
     private void editOrder() {
@@ -99,9 +110,9 @@ public class FlooringMasteryController {
         LocalDate dateChoice = view.inputDate();
         view.displayDateBanner(dateChoice);
         try {
-            view.displayDateOrders(service.getOrders(dateChoice));
+            view.displayDateOrders(service.retrieveOrdersList(dateChoice)); // changed from getOrders to retrieveOrdersList
             int orderNumber = view.getordernumber();
-            Order o = service.getOrder(dateChoice, orderNumber);
+            Order o = service.retrieveOrder(dateChoice, orderNumber); // changed from getOrder to retrieveOrder
             view.displayRemoveOrderBanner();
             view.displayOrders();
             String response = view.askRemove();

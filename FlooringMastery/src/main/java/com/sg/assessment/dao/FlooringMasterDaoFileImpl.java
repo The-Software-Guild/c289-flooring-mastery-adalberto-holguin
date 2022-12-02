@@ -18,8 +18,7 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
     private String PRODUCT_FILE;
     public static final String DELIMITER = ",";
 
-
-    private Map<Integer, Order> ordersList = new HashMap<>();
+    private List<Order> ordersList = new ArrayList<>();
     private List<State> statesList = new ArrayList<>();
     private List<Product> productsList = new ArrayList<>();
 
@@ -43,7 +42,7 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
             createNewOrdersFile(fileName);
             CURRENT_ORDERS = fileName;
         }
-
+        loadOrdersFile();
     }
 
     private File createNewOrdersFile(String fileName) {
@@ -53,14 +52,14 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return newFile;
     }
 
     //check by date?
+    //@Selena date will be set through the service method .setOrdersFile
     @Override
     public List<Order> getOrdersList() throws UnsupportedOperationException {
-        return new ArrayList<Order>(ordersList.values());
+        return ordersList;
     }
 
     @Override
@@ -74,22 +73,22 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
     }
 
     @Override
-    public Order addOrder(String customerName, String state, String productType, BigDecimal area) throws UnsupportedOperationException {
-        loadOrdersFile();
-        //get previous order for order number
-        Order previousOrder = orders.get(orders.size() - 1);
-        int prevOrderNumber = previousOrder.getOrderNumber();
-
-        //creating a new order from required props
-        Order newOrder = new Order(prevOrderNumber + 1, customerName, state, productType, area);
-
+    public Order addOrder(Order newOrder) throws UnsupportedOperationException {
+//        loadOrdersFile();
+//        //get previous order for order number
+//        Order previousOrder = ordersList.get(ordersList.size() - 1);
+//        int prevOrderNumber = previousOrder.getOrderNumber();
+//
+//        //creating a new order from required props
+//        Order newOrder = new Order(prevOrderNumber + 1, customerName, state, productType, area);
+        ordersList.add(newOrder);
         return newOrder;
     }
 
     @Override
     public Order getOrder(int orderNumber) throws UnsupportedOperationException {
         loadOrdersFile();
-        return orders.get(orderNumber);
+        return ordersList.get(orderNumber);
     }
 
     @Override
@@ -176,7 +175,7 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         while (scanner.hasNextLine()) {
             currentLine = scanner.nextLine();
             currentOrder = unmarshallOrder(currentLine);
-            orders.put(currentOrder.getOrderNumber(), currentOrder);
+            ordersList.add(currentOrder);
         }
         scanner.close();
     }

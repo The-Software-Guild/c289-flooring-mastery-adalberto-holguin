@@ -19,57 +19,25 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
 
     private FlooringMasteryDao dao;
 
-
-    public void selectOrderFileFromDate(LocalDate date) {
-        //date format is ensured when collected from user
-        String fileName = "Order_"+date+".txt";
-        dao.setCurrentFile(fileName);
-    }
-
     @Autowired
     public FlooringMasterServiceImpl(FlooringMasteryDao dao) {
         this.dao = dao;
     }
 
     @Override
-    public Order addOrderBasedOnDate(LocalDate date, int orderNumber, String customerName, String state, String productType,
-                                     BigDecimal area) throws UnsupportedOperationException {
-
-        selectOrderFileFromDate(date);
-        List<Order> orderList = dao.getOrdersList();
-        Order newOrder = o
-
-        //Get missing props
-        newOrder.setDate(date);
-
-        //ensure area is at least 100 sq ft
-
-        List<Product> productList = dao.getProductsList();
-        BigDecimal costPerSquareFoot; //get from product in productList
-        BigDecimal laborCostPerSquareFoot;
-
-
-        List<State> stateList = dao.getStatesList();
-        String stateAbbreviation;
-        String stateName;
-        BigDecimal taxRate;
-
-//        newOrder.setTaxRate = taxRate;
-//        newOrder.setCostPerSquareFoot = costPerSquareFoot;
-//        newOrder.setLaborCostPerSquareFoot = laborCostPerSquareFoot;
-//
-//        //from service
-//        newOrder.setMaterialCost = new BigDecimal(calculateMaterialCost(newOrder.getArea(), newOrder.getCostPerSquareFoot()));
-//        newOrder.setLaborCost = new BigDecimal(calculateLaborCost(newOrder.getArea(), newOrder.getLaborCostPerSquareFoot));
-//        newOrder.setTax = new BigDecimal(calculateTax(newOrder.getMaterialCost(), newOrder.getLaborCost(), newOrder.getState()));
-//
-//        newOrder.setTotal = new BigDecimal(newOrder.getMaterialCost(), newOrder.getLaborCost, newOrder.getTax());
-
-        return newOrder;
+    public void selectAndLoadOrdersFile(LocalDate date) {
+        //date format is ensured when collected from user
+        String fileName = "Order_" + date + ".txt";
+        dao.setCurrentFile(fileName);
     }
 
     @Override
-    public void calculatePricesAndStoreOrder(Order order, LocalDate orderDate) {
+    public void enterOrder(Order order) {
+        dao.addOrder(order);
+    }
+
+    @Override
+    public Order calculatePrices(Order order) {
         BigDecimal materialCost = calculateMaterialCost(order, order.getArea(), order.getCostPerSquareFoot());
         BigDecimal laborCost = calculateLaborCost(order, order.getArea(), order.getLaborCostPerSquareFoot());
         BigDecimal tax = calculateTax(order, materialCost, laborCost, order.getState());
@@ -80,8 +48,7 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
         order.setTax(tax);
         order.setTotal(total);
 
-        selectOrdersFile(orderDate); // Setting correct file name in the dao before sending order to be added
-        dao.addOrder(order);
+        return order;
     }
 
 
@@ -122,12 +89,6 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
     }
 
     @Override
-    public void selectOrdersFile(LocalDate date) {
-        dao.setCurrentFile("Orders_" + date);
-    }
-
-
-    @Override
     public Order removeOrder(Order removedOrder) throws UnsupportedOperationException {
         removedOrder = FlooringMasteryDao.removeOrder(removedOrder);
         if (removedOrder != null) {
@@ -141,7 +102,7 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
     }
 
     @Override
-    public List<Order> retrieveOrdersList() {
+    public List<Order> retrieveOrdersList(LocalDate orderDate) {
         return dao.getAllOrders();
     }
 
@@ -156,12 +117,7 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
     }
 
     @Override
-    public List<Order> getOrders(LocalDate dateChoice) throws UnsupportedOperationException {
-        return null;
-    }
+    public Order retrieveOrder(LocalDate dateChoice, int orderNumber) throws UnsupportedOperationException {
 
-    @Override
-    public Order getOrder(LocalDate dateChoice, int orderNumber) throws UnsupportedOperationException {
-        return null;
     }
 }

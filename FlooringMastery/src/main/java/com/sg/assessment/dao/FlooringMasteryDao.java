@@ -21,8 +21,7 @@ public interface FlooringMasteryDao {
             throws UnsupportedOperationException;
 
 
-    Order addOrder(String customerName, String state, String productType, BigDecimal area)
-            throws UnsupportedOperationException;
+    Order addOrder(Order order);
 
     List<State> getStatesList();
 
