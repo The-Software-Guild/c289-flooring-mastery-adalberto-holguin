@@ -79,7 +79,6 @@ public class FlooringMasteryController {
 
     private void addOrder() {
         LocalDate orderDate = view.retrieveOrderDate(); // retrieves order date from user
-        service.selectOrdersFile(orderDate); // Setting up the correct file in the DAO depending on the date user entered
 
         List<Order> ordersList = service.retrieveOrdersList(); // so we can choose correct order number for new order
         List<State> statesList = service.retrieveStatesList(); // so we can show the user our states
@@ -88,10 +87,6 @@ public class FlooringMasteryController {
         
         // Calculates order's material cost, labor cost, tax, and total, and stores the order in respective file
         service.calculatePricesAndStoreOrder(newOrder, orderDate);
-        BigDecimal materialCost = service.calculateMaterialCost(newOrder, newOrder.getArea(), newOrder.getCostPerSquareFoot());
-        BigDecimal laborCost = service.calculateLaborCost(newOrder, newOrder.getArea(), newOrder.getLaborCostPerSquareFoot());
-        BigDecimal tax = service.calculateTax(newOrder, newOrder.getMaterialCost(), newOrder.getLaborCost(), newOrder.getState());
-        service.calculateTotal(newOrder, materialCost, laborCost, tax);
     }
 
     private void editOrder() {
