@@ -151,6 +151,4 @@ public class Order {
     public void setTotal(BigDecimal total) {
         this.total = total;
     }
-
-
 }

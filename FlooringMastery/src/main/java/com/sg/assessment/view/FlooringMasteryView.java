@@ -24,18 +24,20 @@ public class FlooringMasteryView {
     }
 
 
-    public void printMenu() {
+    public void printMainMenu() {
+        io.print("\n* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+        io.print("* <<Flooring Program>>");
+        io.print("* 1. Display Orders");
+        io.print("* 2. Add an Order");
+        io.print("* 3. Edit an Order");
+        io.print("* 4. Remove an Order");
+        io.print("* 5. Export All Data");
+        io.print("* 6. Quit");
+        io.print("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+    }
 
-        io.print("* * * * * * * * * * * * * * * * * ");
-        io.print("* * * * * * * * * * * * * * * * * *");
-        io.print("<<Flooring Program>>");
-        io.print("1. Display Orders");
-        io.print(" 2. Add an Order");
-        io.print("3. Edit an Order");
-        io.print("4. Remove an Order");
-        io.print("Export All Data");
-        io.print("Quit");
-
+    public int retrieveMainMenuSelection() {
+        return io.readInt("\nPlease choose an option from the menu: ", 1, 6);
     }
 
     public void displayUnknownCommandBanner() {
@@ -43,7 +45,7 @@ public class FlooringMasteryView {
     }
 
     public void displayExitBanner() {
-        io.print("Goodbye!!");
+        io.print("\nThank you for using the Flooring Mastery Program! Goodbye!!");
     }
 
     // Whenever we need the order date for editing/adding/removing order etc.
@@ -60,6 +62,28 @@ public class FlooringMasteryView {
             }
         }
         return orderDate;
+    }
+
+    public void displayViewAllBanner(LocalDate currentDate) {
+        io.print("=== ORDERS FOR " + currentDate + " ===");
+    }
+
+    public void displayDivider() {
+        io.print("-------------------");
+    }
+
+    public void displayOrders(List<Order> orderList) {
+        for (Order order : orderList) {
+            io.print("Order: " + order.getOrderNumber() + ": " + order.getCustomerName());
+            displayDivider();
+            io.print("State: " + order.getState());
+            io.print("Product Type: " + order.getProductType());
+            io.print("Area: " + order.getArea() + " sq. ft.");
+            io.print("Material Cost: " + order.getMaterialCost());
+            io.print("Labor Cost: " + order.getLaborCost());
+            io.print("Tax: " + order.getTax());
+            io.print("Total: " + order.getTotal() + "\n");
+        }
     }
 
     // Passing in states and products list to show the user our options. Passing in ordersList to be able to set each order
@@ -135,28 +159,42 @@ public class FlooringMasteryView {
 
     }
 
-    public int getordernumber() {
-        int orderNumber = io.readInt("Enter the order number");
-        return orderNumber;
+
+    public int getOrderNumber() {
+        return io.readInt("Enter the order number");
+        // handle if order does not exist
 
     }
 
     // Prantik
-    public void displayEditMenu() {
+//    public void displayEditMenu() {
+//        io.print("Enter the order");
+//    }
 
+    public Order retrieveOrderToEdit(List<Order> ordersList) {
+        io.readInt("Enter the");
+        return null;
     }
 
     public LocalDate inputDate() {
 
         while (true) {
             try {
-                String dateString = io.readStringNoEmpty("Enter date to search orders (please input in MM/DD/YYYY format):");
+                String dateString = io.readStringNoEmpty("\nEnter date to search orders (please input in MM/DD/YYYY format):");
                 LocalDate ordersDate = LocalDate.parse(dateString, DateTimeFormatter.ofPattern("MM/dd/yyyy"));
                 return ordersDate;
             } catch (DateTimeParseException e) {
                 io.print("The date entered was not in MM/DD/YYYY format, please try again.");
             }
         }
+    }
+
+    public void displayAddOrderSuccessBanner() {
+        io.print("\nOrder added successfully.");
+    }
+
+    public void displayOrderCanceledBanner() {
+        io.print("\nOrder has been cancelled.");
     }
 
     public void displayRemoveOrderBanner() {
@@ -179,15 +217,26 @@ public class FlooringMasteryView {
         System.out.printf("=== Orders on %s ===/n", dateChoice);
     }
 
-    public void displayDateOrders(List<Order> ordersByDate) {
-        for (Order o : ordersByDate) {
-            io.print(o.getOrderNumber() + " | " + o.getCustomerName() + " | " + io.formatCurrency(o.getTotal()));
-        }
+//    public void displayDateOrders(List<Order> ordersByDate) {
+//        for (Order o : ordersByDate) {
+//            io.print(o.getOrderNumber() + " | " + o.getCustomerName() + " | " + io.formatCurrency(o.getTotal()));
+//        }
+//    }
 
-        }
-        public void displayErrorMessage(String errorMsg) {
-            io.print("=== ERROR ===");
-            io.print(errorMsg);
+    public void displayWelcomeMessage() {
+        io.print("~*~*~* WELCOME TO THE FLOORING MASTERY PROGRAM *~*~*~");
+    }
+
+    public void displayErrorMessage(String errorMsg) throws InterruptedException {
+        io.print("=== ERROR ===");
+        io.print(errorMsg);
+        Thread.sleep(1000);
+    }
+
+    public void displayChosenOrder(Order o) {
+        if (o != null) {
+            io.print(o.getProductType());
         }
     }
+}
 

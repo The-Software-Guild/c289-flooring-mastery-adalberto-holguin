@@ -1,15 +1,20 @@
 package com.sg.assessment.dao;
 
+import com.sg.assessment.dao.exceptions.FlooringMasteryPersistenceException;
 import com.sg.assessment.dto.Order;
 import com.sg.assessment.dto.Product;
 import com.sg.assessment.dto.State;
 
+import java.io.File;
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 public interface FlooringMasteryDao {
 
-    void setCurrentFile(String fileName);
+
+    void loadStatesAndProductsLists() throws FlooringMasteryPersistenceException;
+    void setCurrentFile(String fileName) throws FlooringMasteryPersistenceException;
     /**
      * Returns a List of all Orders regardless of status.
      *
@@ -17,11 +22,13 @@ public interface FlooringMasteryDao {
      * @throws UnsupportedOperationException replace later
      */
 
-    List<Order> getOrdersList()
-            throws UnsupportedOperationException;
+    List<Order> getOrdersList();
 
+    public boolean checkFileExist(String fileName);
 
-    Order addOrder(Order order);
+    public void loadfile(Date date);
+
+    Order addOrder(Order order) throws FlooringMasteryPersistenceException;
 
     List<State> getStatesList();
 
@@ -46,10 +53,7 @@ public interface FlooringMasteryDao {
      * @param orderNumber order number to be associated with the order.
      * @throws UnsupportedOperationException replace later
      */
-    static Order removeOrder(Order o)
-            throws UnsupportedOperationException {
-        return null;
-    }
+    Order removeOrder(Order o);
 
     /**
      * Edits properties for the order associated with the order number.
@@ -61,6 +65,7 @@ public interface FlooringMasteryDao {
     void editOrder(int orderNumber, String newCustomerName, String newState,
                    String newProductType, BigDecimal area)
             throws UnsupportedOperationException;
+
 //
 //    /**
 //     * Edits customer name for the order associated with the order number.
