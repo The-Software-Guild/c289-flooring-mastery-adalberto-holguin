@@ -74,7 +74,7 @@ public class FlooringMasteryController {
     }
 
     private void displayOrders() {
-
+        //Selena
 
     }
 
@@ -99,18 +99,22 @@ public class FlooringMasteryController {
             // message from view saying order aborted
         }
     }
-
+    
+    // Prantik
     private void editOrder() {
+        view.retrieveOrderDate();
+        // create method to  get order number
         view.displayEditMenu();
 
     }
 
     private void removeOrder() throws UnsupportedOperationException {
+        // Patrick
         view.displayRemoveOrderBanner();
         LocalDate dateChoice = view.inputDate();
         view.displayDateBanner(dateChoice);
         try {
-            view.displayDateOrders(service.retrieveOrdersList(dateChoice)); // changed from getOrders to retrieveOrdersList
+            view.displayDateOrders(service.retrieveOrdersList()); // changed from getOrders to retrieveOrdersList
             int orderNumber = view.getordernumber();
             Order o = service.retrieveOrder(dateChoice, orderNumber); // changed from getOrder to retrieveOrder
             view.displayRemoveOrderBanner();

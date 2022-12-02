@@ -55,8 +55,7 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         return newFile;
     }
 
-    //check by date?
-    //@Selena date will be set through the service method .setOrdersFile
+    // correct date file has already been loaded
     @Override
     public List<Order> getOrdersList() throws UnsupportedOperationException {
         return ordersList;
@@ -74,15 +73,9 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
 
     @Override
     public Order addOrder(Order newOrder) throws UnsupportedOperationException {
-//        loadOrdersFile();
-//        //get previous order for order number
-//        Order previousOrder = ordersList.get(ordersList.size() - 1);
-//        int prevOrderNumber = previousOrder.getOrderNumber();
-//
-//        //creating a new order from required props
-//        Order newOrder = new Order(prevOrderNumber + 1, customerName, state, productType, area);
         ordersList.add(newOrder);
-        return newOrder;
+        // need to add to the order file (already has correct date) NEEDS DONE
+        return newOrder; // this may not need a return
     }
 
     @Override
@@ -109,13 +102,14 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         }
     }
 
+    // Prantik
     @Override
     public void editOrder(int orderNumber, String newCustomerName, String newState,
                           String newProductType, BigDecimal newArea)
             throws UnsupportedOperationException {
         Order orderToEdit = getOrder(orderNumber);
         orderToEdit.setCustomerName(newCustomerName);
-        orderToEdit.setState(newState);
+        orderToEdit.setState(newState); // if we edit state we have to run the service layer's
         orderToEdit.setProductType(newProductType);
         orderToEdit.setArea(newArea);
         writeOrdersFile();
@@ -172,6 +166,8 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
 
         String currentLine;
         Order currentOrder;
+        String ordersHeader = scanner.nextLine(); // this will take the header
+
         while (scanner.hasNextLine()) {
             currentLine = scanner.nextLine();
             currentOrder = unmarshallOrder(currentLine);
@@ -239,6 +235,8 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
 
     private void writeOrdersFile() throws UnsupportedOperationException {
         PrintWriter out;
+        // first write the header
+        // ...then continue with the orders
         try {
             out = new PrintWriter(new FileWriter(CURRENT_ORDERS));
         } catch (IOException e) {
