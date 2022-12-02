@@ -51,6 +51,11 @@ public class UserIOConsoleImpl implements UserIO {
     }
 
     @Override
+    public String formatCurrency(BigDecimal amount) {
+        return null;
+    }
+
+    @Override
     public int readInt(String prompt) {
         Scanner inputReader = new Scanner(System.in);
         System.out.println(prompt);
