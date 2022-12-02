@@ -1,5 +1,6 @@
 package com.sg.assessment.dao;
 
+import com.sg.assessment.dao.exceptions.FlooringMasteryPersistenceException;
 import com.sg.assessment.dto.Order;
 
 import java.io.*;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
 
-    private String CURRENT_ORDERS;
+    private String CURRENT_ORDERS_FILE;
     private String STATE_FILE;
     private String PRODUCT_FILE;
     public static final String DELIMITER = ",";
@@ -23,41 +24,64 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
     private List<Product> productsList = new ArrayList<>();
 
     public FlooringMasterDaoFileImpl() {
-        CURRENT_ORDERS = "default.txt";
-        STATE_FILE = "Taxes.txt";
-        PRODUCT_FILE = "Products.txt";
+        CURRENT_ORDERS_FILE = "default.txt";
+        STATE_FILE = ".\\data\\Taxes.txt";
+        PRODUCT_FILE = ".\\data\\Products.txt";
     }
 
-    public FlooringMasterDaoFileImpl(String currentTextFile) {
-        CURRENT_ORDERS = currentTextFile;
+//    public FlooringMasterDaoFileImpl(String currentTextFile) {
+//        CURRENT_ORDERS_FILE = currentTextFile;
+//    }
+
+    @Override
+    public void loadStatesAndProductsLists() throws FlooringMasteryPersistenceException {
+        loadStateFile();
+        loadProductFile();
     }
 
-    //adding setter to be able to switch between different files
-    //file param will have date in the file name
-    public void setCurrentFile(String fileName) {
-        File checkFile = new File(".\\orders\\" + fileName);
-        if (checkFile.exists()) {
-            CURRENT_ORDERS = fileName;
-        } else {
+    // We will use this when adding files because we WANT TO create one if it doesn't exist
+    public void setCurrentFile(String fileName) throws FlooringMasteryPersistenceException {
+        File checkFile = new File(fileName);
+
+        // If file does not exist, creates it
+        if (!checkFile.exists()) {
             createNewOrdersFile(fileName);
-            CURRENT_ORDERS = fileName;
         }
+        CURRENT_ORDERS_FILE = fileName;
+
         loadOrdersFile();
     }
 
-    private File createNewOrdersFile(String fileName) {
-        File newFile = new File(".\\orders\\" + fileName);
+    // We will use this when editing files, because we DO NOT want to create a new one
+    public boolean checkFileExist(String fileName) {
+        File checkFile = new File(fileName);
+        return checkFile.exists();
+    }
+
+    private void createNewOrdersFile(String fileName) throws FlooringMasteryPersistenceException {
+        File newFile = new File(fileName);
         try {
             newFile.createNewFile();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new FlooringMasteryPersistenceException("Error accessing orders file.");
         }
-        return newFile;
     }
+
+
+
+    public void loadfile(Date date){
+        File newFile = new File(".\\orders\\" + date);
+        if(newFile.exists()){
+            loadOrdersFile();
+        }
+    }
+
+
+
 
     // correct date file has already been loaded
     @Override
-    public List<Order> getOrdersList() throws UnsupportedOperationException {
+    public List<Order> getOrdersList() {
         return ordersList;
     }
 
@@ -72,8 +96,9 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
     }
 
     @Override
-    public Order addOrder(Order newOrder) throws UnsupportedOperationException {
+    public Order addOrder(Order newOrder) throws UnsupportedOperationException, FlooringMasteryPersistenceException {
         ordersList.add(newOrder);
+        writeOrdersFile(ordersList);
         // need to add to the order file (already has correct date) NEEDS DONE
         return newOrder; // this may not need a return
     }
@@ -85,22 +110,25 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
     }
 
     @Override
-    public Order removeOrder(Order chosenOrder) throws UnsupportedOperationException {
+    public Order removeOrder(Order chosenOrder) {
 
         int orderNumber = chosenOrder.getOrderNumber();
 
-        List<Order> order = loadOrders(chosenOrder.getDate());
+        List<Order> orders = getOrdersList();
         Order removedOrder = orders.stream()
                 .filter(o -> o.getOrderNumber() == orderNumber)
                 .findFirst().orElse(null);
+
         if (removedOrder != null) {
-            order.remove(removedOrder);
-            writeOrders(orders, chosenOrder.getDate());
+            orders.remove(removedOrder);
+            //writeOrdersFile();
             return removedOrder;
         } else {
             return null;
         }
+
     }
+
 
     // Prantik
     @Override
@@ -149,7 +177,7 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         Product product = new Product();
         product.setProductType(productToken[0]);
         product.setCostPerSquareFoot(new BigDecimal(productToken[1]));
-        product.setCostPerSquareFoot(new BigDecimal(productToken[2]));
+        product.setLaborCostPerSquareFoot(new BigDecimal(productToken[2]));
 
         return product;
     }
@@ -159,15 +187,19 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         try {
             scanner = new Scanner(
                     new BufferedReader(
-                            new FileReader(CURRENT_ORDERS)));
+                            new FileReader(CURRENT_ORDERS_FILE)));
         } catch (FileNotFoundException e) {
+            System.out.println(CURRENT_ORDERS_FILE);
             throw new UnsupportedOperationException("Could not load file into memory.");
         }
 
         String currentLine;
         Order currentOrder;
-        String ordersHeader = scanner.nextLine(); // this will take the header
+        if (scanner.hasNextLine()) {
+            String ordersHeader = scanner.nextLine(); // this will take the header
+        }
 
+        ordersList.clear();
         while (scanner.hasNextLine()) {
             currentLine = scanner.nextLine();
             currentOrder = unmarshallOrder(currentLine);
@@ -176,18 +208,21 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         scanner.close();
     }
 
-    private void loadStateFile() {
+    private void loadStateFile() throws FlooringMasteryPersistenceException {
         Scanner scanner;
         try {
             scanner = new Scanner(
                     new BufferedReader(
                             new FileReader(STATE_FILE)));
         } catch (FileNotFoundException e) {
-            throw new UnsupportedOperationException("Could not load file into memory.");
+            throw new FlooringMasteryPersistenceException("Error. Could not load state data from " + STATE_FILE + " the file " +
+                    "may have been moved or deleted.");
         }
 
         String currentLine;
         State currentState;
+        scanner.nextLine(); // this will take the header
+
         while (scanner.hasNextLine()) {
             currentLine = scanner.nextLine();
             currentState = unmarshallState(currentLine);
@@ -196,18 +231,21 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         scanner.close();
     }
 
-    private void loadProductFile() throws UnsupportedOperationException {
+    private void loadProductFile() throws FlooringMasteryPersistenceException {
         Scanner scanner;
         try {
             scanner = new Scanner(
                     new BufferedReader(
                             new FileReader(PRODUCT_FILE)));
         } catch (FileNotFoundException e) {
-            throw new UnsupportedOperationException("Could not load file into memory.");
+            throw new FlooringMasteryPersistenceException("Error. Could not load product data from " + PRODUCT_FILE + " the " +
+                    "file may have been moved or deleted.");
         }
 
         String currentLine;
         Product currentProduct;
+        scanner.nextLine(); // this will take the header
+
         while (scanner.hasNextLine()) {
             currentLine = scanner.nextLine();
             currentProduct = unmarshallProduct(currentLine);
@@ -233,18 +271,22 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         return orderAsText;
     }
 
-    private void writeOrdersFile() throws UnsupportedOperationException {
+    private void writeOrdersFile(List<Order> orderList) throws FlooringMasteryPersistenceException {
         PrintWriter out;
+
+        try {
+            out = new PrintWriter(new FileWriter(CURRENT_ORDERS_FILE));
+        } catch (IOException e) {
+            throw new FlooringMasteryPersistenceException("Error. Could not write order data to file.");
+        }
         // first write the header
         // ...then continue with the orders
-        try {
-            out = new PrintWriter(new FileWriter(CURRENT_ORDERS));
-        } catch (IOException e) {
-            throw new UnsupportedOperationException();
-        }
+
+        String header = "OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot,LaborCostPerSquareFoot," +
+                "MaterialCost,LaborCost,Tax,Total";
+        out.println(header);
 
         String orderAsText;
-        List<Order> orderList = this.getAllOrders();
         for (Order order : orderList) {
             orderAsText = marshallOrder(order);
             out.println(orderAsText);
@@ -253,5 +295,4 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
 
         out.close();
     }
-
 }

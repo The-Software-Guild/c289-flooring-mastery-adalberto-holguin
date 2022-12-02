@@ -1,16 +1,19 @@
 package com.sg.assessment.service;
 
 import com.sg.assessment.dao.FlooringMasteryDao;
+import com.sg.assessment.dao.exceptions.FlooringMasteryPersistenceException;
 import com.sg.assessment.dto.Order;
 import com.sg.assessment.dto.Product;
 import com.sg.assessment.dto.State;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 
@@ -25,14 +28,40 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
     }
 
     @Override
-    public void selectAndLoadOrdersFile(LocalDate date) {
+    public void selectAndLoadOrdersFile(LocalDate date) throws FlooringMasteryPersistenceException {
         //date format is ensured when collected from user
-        String fileName = "Orders_" + date + ".txt";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMddYYY");
+
+        String dateAsString = date.format(formatter);
+        String fileName = ".\\orders\\Orders_" + dateAsString + ".txt";
         dao.setCurrentFile(fileName);
     }
 
+
     @Override
-    public void enterOrder(Order order) {
+    public void loadStatesAndProducts() throws FlooringMasteryPersistenceException {
+        dao.loadStatesAndProductsLists();
+    }
+
+//    public File getFile(LocalDate date) {
+//        //date format is ensured when collected from user
+//        File checkfile;
+//        String fileName = "Orders_" + date + ".txt";
+//        checkfile = dao.getFile(fileName);
+//        return checkfile;
+//    }
+
+
+    public boolean FileExist(LocalDate date) {
+        //date format is ensured when collected from user
+        boolean checkFile;
+        String fileName = "Orders_" + date + ".txt";
+        checkFile = dao.checkFileExist(fileName);
+        return checkFile;
+    }
+
+    @Override
+    public void enterOrder(Order order) throws FlooringMasteryPersistenceException {
         dao.addOrder(order);
     }
 
@@ -53,6 +82,15 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
         order.setTotal(total);
 
         return order;
+    }
+
+    @Override
+    public void editOrder() {
+        //call the dao's writeFile
+    }
+
+    public void loadfile(Date date) {
+        dao.loadfile(date);
     }
 
 
@@ -94,9 +132,9 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
 
     @Override
     public Order removeOrder(Order removedOrder) throws UnsupportedOperationException {
-        removedOrder = FlooringMasteryDao.removeOrder(removedOrder);
+        removedOrder = removeOrder(removedOrder);
         if (removedOrder != null) {
-            dao.writeAuditEntry("Order #"
+            dao.checkFileExist("Order #"
                     + removedOrder.getOrderNumber() + " for date"
                     + removedOrder.getDate() + " REMOVED");
             return removedOrder;
@@ -106,8 +144,8 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
     }
 
     @Override
-    public List<Order> retrieveOrdersList(LocalDate orderDate) {
-        return dao.getAllOrders();
+    public List<Order> retrieveOrdersList() {
+        return dao.getOrdersList();
     }
 
     @Override
@@ -122,6 +160,6 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
 
     @Override
     public Order retrieveOrder(LocalDate dateChoice, int orderNumber) throws UnsupportedOperationException {
-
+        return null;
     }
 }
