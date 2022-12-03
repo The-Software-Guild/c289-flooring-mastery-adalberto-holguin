@@ -12,6 +12,7 @@ import com.sg.assessment.view.FlooringMasteryView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -61,6 +62,8 @@ public class FlooringMasteryController {
                     } catch (FlooringMasteryPersistenceException e) {
                         view.displayErrorMessage(e.getMessage());
                         isInitialized = false; // must quit program as this means a problem creating or writing to order file.
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
                     }
                     break;
                 case 3:
@@ -97,14 +100,13 @@ public class FlooringMasteryController {
 
     // Adalberto
     private void addOrder() throws InvalidDateException, FlooringMasteryPersistenceException, InterruptedException,
-            NoOrdersOnDateException {
+            NoOrdersOnDateException, IOException {
         LocalDate orderDate = view.retrieveOrderDate();
 
         if (orderDate.isBefore(LocalDate.now())) {
             throw new InvalidDateException("Error, invalid date. New orders cannot be added to past dates.");
         } else {
-            service.selectAndLoadOrders(orderDate, Action.ADD); // assigning order to correct file, creates it if it does not
-            // exist
+            service.selectAndLoadOrders(orderDate, Action.ADD); // assigning order to correct file, creates if does not exist
         }
 
         List<Order> ordersList = service.retrieveOrdersList(); // so we can assign correct order number using ordersList.size()
@@ -121,6 +123,7 @@ public class FlooringMasteryController {
             service.enterOrder(newOrder);
             view.displayAddOrderSuccessBanner(newOrder);
         } else {
+            service.checkFileIsEmpty();
             view.displayOrderCanceledBanner();
         }
     }

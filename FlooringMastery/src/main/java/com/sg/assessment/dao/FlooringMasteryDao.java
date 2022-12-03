@@ -8,6 +8,8 @@ import com.sg.assessment.dto.Product;
 import com.sg.assessment.dto.State;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -35,6 +37,8 @@ public interface FlooringMasteryDao {
     List<State> getStatesList();
 
     List<Product> getProductsList();
+
+    void deleteFileIfEmpty() throws IOException;
 
     /**
      * Retrieves an Order from the file by its order number and returns it.
