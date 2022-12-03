@@ -60,19 +60,19 @@ public class FlooringMasteryController {
                     }
                     break;
                 case 3:
-                    editOrder();
+                    //editOrder();
                     break;
                 case 4:
                     removeOrder();
                     break;
                 case 5:
-                    exportData();
+                    //exportData();
                     break;
                 case 6:
                     isInitialized = false;
                     break;
                 default:
-                    unknownCommand();
+                    //unknownCommand();
             }
         }
         view.displayExitBanner();
@@ -91,18 +91,18 @@ public class FlooringMasteryController {
     }
 
     // Adalberto
-    private void addOrder() throws InvalidDateException, FlooringMasteryPersistenceException {
-        LocalDate orderDate = view.retrieveOrderDate(); // retrieves order date from user
+    private void addOrder() throws InvalidDateException, FlooringMasteryPersistenceException, InterruptedException {
+        LocalDate orderDate = view.retrieveOrderDate();
 
         if (orderDate.isBefore(LocalDate.now())) {
-            throw new InvalidDateException("Invalid date. Your order date must be in the future.");
+            throw new InvalidDateException("Error, invalid date. New orders cannot be added to past dates.");
         } else {
-            service.selectAndLoadOrdersFile(orderDate); // assigning order to correct file
+            service.selectAndLoadOrdersFile(orderDate); // assigning order to correct file, creates it if it does not exist
         }
 
-        List<Order> ordersList = service.retrieveOrdersList(); // so we can choose correct order number for new order
-        List<State> statesList = service.retrieveStatesList(); // so we can show the user our states
-        List<Product> productsList = service.retrieveProductsList(); // so we can show the user our products
+        List<Order> ordersList = service.retrieveOrdersList(); // so we can assign correct order number using ordersList.size()
+        List<State> statesList = service.retrieveStatesList();
+        List<Product> productsList = service.retrieveProductsList();
         Order newOrder = view.retrieveOrderInformation(ordersList, statesList, productsList); // retrieves order info from user
 
         // Calculates order's material cost, labor cost, tax, and total
@@ -152,29 +152,30 @@ public class FlooringMasteryController {
     }
 
     private void removeOrder() throws UnsupportedOperationException {
-        // Patrick
-        view.displayRemoveOrderBanner();
-        LocalDate dateChoice = view.inputDate(); // getting order date
-        view.displayDateBanner(dateChoice); // displayChosenOrder
-        try {
-            int orderNumber = view.getOrderNumber(); //getting order number
-            Order o = service.retrieveOrder(dateChoice, orderNumber); // changed from getOrder to retrieveOrder
-            view.displayChosenOrder(o); // can be deleted, should only display chosen order
-            view.displayRemoveOrderBanner(); // shows that the order is being removed
-            String response = view.askRemove(); // confirms if the user wants to remove the order
-            if (response.equalsIgnoreCase("Y")) {
-                service.removeOrder(o);
-                view.displayRemoverOrderSuccess(true, o);
-            } else if (response.equalsIgnoreCase("N")) {
-                view.displayRemoverOrderSuccess(false, o);
-            } else {
-                unknownCommand();
-            }
-        } catch (UnsupportedOperationException e) {
-            view.displayErrorMessage();
-        }
-        private void exportData () {
-        }
+//        // Patrick
+//        view.displayRemoveOrderBanner();
+//        LocalDate dateChoice = view.inputDate(); // getting order date
+//        view.displayDateBanner(dateChoice); // displayChosenOrder
+//        try {
+//            int orderNumber = view.getOrderNumber(); //getting order number
+//            Order o = service.retrieveOrder(dateChoice, orderNumber); // changed from getOrder to retrieveOrder
+//            view.displayChosenOrder(o); // can be deleted, should only display chosen order
+//            view.displayRemoveOrderBanner(); // shows that the order is being removed
+//            String response = view.askRemove(); // confirms if the user wants to remove the order
+//            if (response.equalsIgnoreCase("Y")) {
+//                service.removeOrder(o);
+//                view.displayRemoverOrderSuccess(true, o);
+//            } else if (response.equalsIgnoreCase("N")) {
+//                view.displayRemoverOrderSuccess(false, o);
+//            } else {
+//                unknownCommand();
+//            }
+//        } catch (UnsupportedOperationException e) {
+//            view.displayErrorMessage();
+//        }
+//        private void exportData () {
+//        }
+//    }
     }
 }
 

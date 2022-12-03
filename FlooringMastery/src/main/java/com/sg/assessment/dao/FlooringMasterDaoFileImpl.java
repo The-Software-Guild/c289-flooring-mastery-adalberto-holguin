@@ -52,7 +52,7 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         loadOrdersFile();
     }
 
-    // We will use this when editing files, because we DO NOT want to create a new one
+    // We will use this when displaying and/or orders, because we DO NOT want to create a new file if it doesn't exist
     public boolean checkFileExist(String fileName) {
         File checkFile = new File(fileName);
         return checkFile.exists();
@@ -135,12 +135,12 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
     public void editOrder(int orderNumber, String newCustomerName, String newState,
                           String newProductType, BigDecimal newArea)
             throws UnsupportedOperationException {
-        Order orderToEdit = getOrder(orderNumber);
-        orderToEdit.setCustomerName(newCustomerName);
-        orderToEdit.setState(newState); // if we edit state we have to run the service layer's
-        orderToEdit.setProductType(newProductType);
-        orderToEdit.setArea(newArea);
-        writeOrdersFile();
+//        Order orderToEdit = getOrder(orderNumber);
+//        orderToEdit.setCustomerName(newCustomerName);
+//        orderToEdit.setState(newState); // if we edit state we have to run the service layer's
+//        orderToEdit.setProductType(newProductType);
+//        orderToEdit.setArea(newArea);
+//        writeOrdersFile();
     }
 
     private Order unmarshallOrder(String orderAsText) {
