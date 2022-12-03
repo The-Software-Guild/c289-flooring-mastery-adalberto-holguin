@@ -2,6 +2,7 @@ package com.sg.assessment.view;
 
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Scanner;
@@ -63,16 +64,26 @@ public class UserIOConsoleImpl implements UserIO {
     }
 
     @Override
-    public int readInt(String prompt, int min, int max) {
+    public int readInt(String prompt, int min, int max) throws InterruptedException {
         Scanner inputReader = new Scanner(System.in);
         int num;
-        do {
-            System.out.println(prompt);
-            num = Integer.parseInt(inputReader.nextLine());
-            if (num < min || num > max) {
-                System.out.println("Invalid input, enter a number between " + min + " and " + max + ".");
+        while (true) {
+            try {
+                do {
+                    System.out.println(prompt);
+                    num = Integer.parseInt(inputReader.nextLine());
+                    if (num < min || num > max) {
+                        System.out.println("Invalid input, enter a number between " + min + " and " + max + ".");
+                        Thread.sleep(1500);
+                    }
+                } while (num < min || num > max);
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Error. Please input only whole numbers for your selection.");
+                Thread.sleep(1500);
+
             }
-        } while (num < min || num > max);
+        }
         return num;
     }
 

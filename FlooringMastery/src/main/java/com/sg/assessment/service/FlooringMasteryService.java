@@ -6,10 +6,8 @@ import com.sg.assessment.dto.Product;
 import com.sg.assessment.dto.State;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 
 @Component
