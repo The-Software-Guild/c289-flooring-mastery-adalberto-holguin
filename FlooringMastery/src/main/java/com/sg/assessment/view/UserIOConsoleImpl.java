@@ -52,6 +52,27 @@ public class UserIOConsoleImpl implements UserIO {
     }
 
     @Override
+    public String readNames(String prompt) {
+        Scanner inputReader = new Scanner(System.in);
+        String returnString;
+        do {
+            System.out.println(prompt);
+            if ((returnString = inputReader.nextLine().trim()).equals("")) {
+                System.out.println("No input received, please try again.");
+            } else {
+                for (int i = 0; i < returnString.length(); i++) {
+                    if (!Character.isLetterOrDigit(returnString.charAt(i)) && returnString.charAt(i) != ' ' && returnString.charAt(i) != '.') {
+                        System.out.println("Customer name cannot contain special characters.");
+                        returnString = ""; // so do-while keeps looping
+                        break;
+                    }
+                }
+            }
+        } while (returnString.equals(""));
+        return returnString;
+    }
+
+    @Override
     public String formatCurrency(BigDecimal amount) {
         return null;
     }
@@ -174,7 +195,7 @@ public class UserIOConsoleImpl implements UserIO {
                 return num;
             } catch (NumberFormatException e) {
                 // If the user inputs something other than numbers
-                System.out.println("Invalid input, please only enter numbers.");
+                System.out.println("Invalid numeric input, please try again.");
             }
         }
     }

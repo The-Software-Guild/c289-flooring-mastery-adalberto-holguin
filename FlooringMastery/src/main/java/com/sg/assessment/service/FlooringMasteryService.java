@@ -1,6 +1,8 @@
 package com.sg.assessment.service;
 
 import com.sg.assessment.dao.exceptions.FlooringMasteryPersistenceException;
+import com.sg.assessment.dao.exceptions.NoOrdersOnDateException;
+import com.sg.assessment.dto.Action;
 import com.sg.assessment.dto.Order;
 import com.sg.assessment.dto.Product;
 import com.sg.assessment.dto.State;
@@ -35,7 +37,7 @@ public interface FlooringMasteryService {
 
     BigDecimal calculateTotal(Order order, BigDecimal materialCost, BigDecimal laborCost, BigDecimal tax);
 
-    void selectAndLoadOrdersFile(LocalDate date) throws FlooringMasteryPersistenceException;
+    void selectAndLoadOrders(LocalDate date, Action action) throws FlooringMasteryPersistenceException, NoOrdersOnDateException;
 
     void loadStatesAndProducts() throws FlooringMasteryPersistenceException;
 
