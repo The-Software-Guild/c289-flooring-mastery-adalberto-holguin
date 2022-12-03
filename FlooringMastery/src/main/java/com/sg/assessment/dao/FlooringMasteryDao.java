@@ -1,6 +1,8 @@
 package com.sg.assessment.dao;
 
 import com.sg.assessment.dao.exceptions.FlooringMasteryPersistenceException;
+import com.sg.assessment.dao.exceptions.NoOrdersOnDateException;
+import com.sg.assessment.dto.Action;
 import com.sg.assessment.dto.Order;
 import com.sg.assessment.dto.Product;
 import com.sg.assessment.dto.State;
@@ -14,7 +16,7 @@ public interface FlooringMasteryDao {
 
 
     void loadStatesAndProductsLists() throws FlooringMasteryPersistenceException;
-    void setCurrentFile(String fileName) throws FlooringMasteryPersistenceException;
+    void setCurrentFile(String fileName, Action action) throws FlooringMasteryPersistenceException, NoOrdersOnDateException;
     /**
      * Returns a List of all Orders regardless of status.
      *

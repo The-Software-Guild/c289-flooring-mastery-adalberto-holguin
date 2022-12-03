@@ -2,6 +2,8 @@ package com.sg.assessment.service;
 
 import com.sg.assessment.dao.FlooringMasteryDao;
 import com.sg.assessment.dao.exceptions.FlooringMasteryPersistenceException;
+import com.sg.assessment.dao.exceptions.NoOrdersOnDateException;
+import com.sg.assessment.dto.Action;
 import com.sg.assessment.dto.Order;
 import com.sg.assessment.dto.Product;
 import com.sg.assessment.dto.State;
@@ -28,13 +30,14 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
     }
 
     @Override
-    public void selectAndLoadOrdersFile(LocalDate date) throws FlooringMasteryPersistenceException {
+    public void selectAndLoadOrders(LocalDate date, Action action) throws FlooringMasteryPersistenceException,
+            NoOrdersOnDateException {
         //date format is ensured when collected from user
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMddYYY");
 
         String dateAsString = date.format(formatter);
         String fileName = ".\\orders\\Orders_" + dateAsString + ".txt";
-        dao.setCurrentFile(fileName);
+        dao.setCurrentFile(fileName, action);
     }
 
 

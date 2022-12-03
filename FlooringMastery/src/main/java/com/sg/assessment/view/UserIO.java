@@ -13,6 +13,8 @@ public interface UserIO {
 
     String readStringNoEmpty(String prompt);
 
+    String readNames(String prompt);
+
     String formatCurrency(BigDecimal amount);
 
     int readInt(String prompt);
