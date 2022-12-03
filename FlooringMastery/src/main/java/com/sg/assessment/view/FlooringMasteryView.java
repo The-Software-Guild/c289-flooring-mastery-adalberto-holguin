@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.sg.assessment.dto.Order;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 
 import java.time.LocalDate;
@@ -36,7 +37,7 @@ public class FlooringMasteryView {
         io.print("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
     }
 
-    public int retrieveMainMenuSelection() {
+    public int retrieveMainMenuSelection() throws InterruptedException {
         return io.readInt("\nPlease choose an option from the menu: ", 1, 6);
     }
 
@@ -54,7 +55,7 @@ public class FlooringMasteryView {
 
         while (true) {
             try {
-                String dateString = io.readStringNoEmpty("Enter the order date (please input in MM/DD/YYYY format):");
+                String dateString = io.readStringNoEmpty("\nEnter the order date (please input in MM/DD/YYYY format):");
                 orderDate = LocalDate.parse(dateString, DateTimeFormatter.ofPattern("MM/dd/yyyy"));
                 break;
             } catch (DateTimeParseException e) {
@@ -88,7 +89,7 @@ public class FlooringMasteryView {
 
     // Passing in states and products list to show the user our options. Passing in ordersList to be able to set each order
     // number to ordersList.size() + 1, auto-incrementing order numbers.
-    public Order retrieveOrderInformation(List<Order> ordersList, List<State> statesList, List<Product> productsList) {
+    public Order retrieveOrderInformation(List<Order> ordersList, List<State> statesList, List<Product> productsList) throws InterruptedException {
 
         // Getting customer name
         String customerName = io.readStringNoEmpty("Enter customer name");
@@ -132,7 +133,7 @@ public class FlooringMasteryView {
         return order;
     }
 
-    public boolean confirmOrder(Order order) {
+    public boolean confirmOrder(Order order) throws InterruptedException {
         io.print("\nOrder Review");
         io.print("\nOrder Number: " + order.getOrderNumber());
         io.print("Customer Name: " + order.getCustomerName());
@@ -224,7 +225,7 @@ public class FlooringMasteryView {
 //    }
 
     public void displayWelcomeMessage() {
-        io.print("~*~*~* WELCOME TO THE FLOORING MASTERY PROGRAM *~*~*~");
+        io.print("\n~*~*~*~*~*~* WELCOME TO THE FLOORING MASTERY PROGRAM *~*~*~*~*~*~");
     }
 
     public void displayErrorMessage(String errorMsg) throws InterruptedException {

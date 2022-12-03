@@ -1,5 +1,6 @@
 package com.sg.assessment.view;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 
 public interface UserIO {
@@ -16,7 +17,7 @@ public interface UserIO {
 
     int readInt(String prompt);
 
-    int readInt(String prompt, int min, int max);
+    int readInt(String prompt, int min, int max) throws InterruptedException;
 
     double readDouble(String prompt);
 
