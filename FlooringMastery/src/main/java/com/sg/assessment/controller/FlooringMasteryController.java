@@ -51,7 +51,7 @@ public class FlooringMasteryController {
                         view.displayErrorMessage(e.getMessage());
                     } catch (FlooringMasteryPersistenceException e) {
                         view.displayErrorMessage(e.getMessage());
-                        isInitialized = false; // must quit program as this means we could not read order file
+                        isInitialized = false;
                     }
                     break;
                 case 2:
@@ -59,11 +59,9 @@ public class FlooringMasteryController {
                         addOrder();
                     } catch (InvalidDateException | NoOrdersOnDateException e) {
                         view.displayErrorMessage(e.getMessage());
-                    } catch (FlooringMasteryPersistenceException e) {
+                    } catch (FlooringMasteryPersistenceException | IOException e) {
                         view.displayErrorMessage(e.getMessage());
-                        isInitialized = false; // must quit program as this means a problem creating or writing to order file.
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        isInitialized = false;
                     }
                     break;
                 case 3:

@@ -10,7 +10,6 @@ import com.sg.assessment.dto.State;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -38,7 +37,7 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
 
         String dateAsString = date.format(formatter);
         String fileName = ".\\orders\\Orders_" + dateAsString + ".txt";
-        dao.setCurrentFile(fileName, action);
+        dao.setCurrentOrdersFile(fileName, action);
     }
 
 
@@ -98,9 +97,9 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
         //call the dao's writeFile
     }
 
-    public void loadfile(Date date) {
-        dao.loadfile(date);
-    }
+//    public void loadfile(Date date) {
+//        dao.loadfile(date);
+//    }
 
 
     @Override
