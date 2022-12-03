@@ -2,6 +2,8 @@ package com.sg.assessment.controller;
 
 import com.sg.assessment.controller.exceptions.InvalidDateException;
 import com.sg.assessment.dao.exceptions.FlooringMasteryPersistenceException;
+import com.sg.assessment.dao.exceptions.NoOrdersOnDateException;
+import com.sg.assessment.dto.Action;
 import com.sg.assessment.dto.Order;
 import com.sg.assessment.dto.Product;
 import com.sg.assessment.dto.State;
@@ -44,6 +46,8 @@ public class FlooringMasteryController {
                 case 1:
                     try {
                         displayOrders();
+                    } catch (NoOrdersOnDateException e) {
+                        view.displayErrorMessage(e.getMessage());
                     } catch (FlooringMasteryPersistenceException e) {
                         view.displayErrorMessage(e.getMessage());
                         isInitialized = false; // must quit program as this means we could not read order file
@@ -52,7 +56,7 @@ public class FlooringMasteryController {
                 case 2:
                     try {
                         addOrder();
-                    } catch (InvalidDateException e) {
+                    } catch (InvalidDateException | NoOrdersOnDateException e) {
                         view.displayErrorMessage(e.getMessage());
                     } catch (FlooringMasteryPersistenceException e) {
                         view.displayErrorMessage(e.getMessage());
@@ -71,8 +75,6 @@ public class FlooringMasteryController {
                 case 6:
                     isInitialized = false;
                     break;
-                default:
-                    //unknownCommand();
             }
         }
         view.displayExitBanner();
@@ -82,22 +84,27 @@ public class FlooringMasteryController {
         service.loadStatesAndProducts();
     }
 
-    private void displayOrders() throws FlooringMasteryPersistenceException {
+    private void displayOrders() throws FlooringMasteryPersistenceException, NoOrdersOnDateException {
         LocalDate orderDate = view.retrieveOrderDate();
-        service.selectAndLoadOrdersFile(orderDate);
+        service.selectAndLoadOrders(orderDate, Action.DISPLAY);
         List<Order> ordersList = service.retrieveOrdersList();
+        if (ordersList.size() == 0) {
+            throw new NoOrdersOnDateException("There are no orders for the specified date.");
+        }
         view.displayViewAllBanner(orderDate);
         view.displayOrders(ordersList);
     }
 
     // Adalberto
-    private void addOrder() throws InvalidDateException, FlooringMasteryPersistenceException, InterruptedException {
+    private void addOrder() throws InvalidDateException, FlooringMasteryPersistenceException, InterruptedException,
+            NoOrdersOnDateException {
         LocalDate orderDate = view.retrieveOrderDate();
 
         if (orderDate.isBefore(LocalDate.now())) {
             throw new InvalidDateException("Error, invalid date. New orders cannot be added to past dates.");
         } else {
-            service.selectAndLoadOrdersFile(orderDate); // assigning order to correct file, creates it if it does not exist
+            service.selectAndLoadOrders(orderDate, Action.ADD); // assigning order to correct file, creates it if it does not
+            // exist
         }
 
         List<Order> ordersList = service.retrieveOrdersList(); // so we can assign correct order number using ordersList.size()
@@ -112,7 +119,7 @@ public class FlooringMasteryController {
         boolean orderIsConfirmed = view.confirmOrder(newOrder);
         if (orderIsConfirmed) {
             service.enterOrder(newOrder);
-            view.displayAddOrderSuccessBanner();
+            view.displayAddOrderSuccessBanner(newOrder);
         } else {
             view.displayOrderCanceledBanner();
         }
@@ -125,7 +132,7 @@ public class FlooringMasteryController {
 
         if (fileExists) {
             try {
-                service.selectAndLoadOrdersFile(date);
+                service.selectAndLoadOrders(date, Action.EDIT);
                 List<Order> ordersList = service.retrieveOrdersList();
 
                 view.retrieveOrderToEdit(ordersList);
@@ -152,7 +159,7 @@ public class FlooringMasteryController {
     }
 
     private void removeOrder() throws UnsupportedOperationException {
-//        // Patrick
+        // Patrick
 //        view.displayRemoveOrderBanner();
 //        LocalDate dateChoice = view.inputDate(); // getting order date
 //        view.displayDateBanner(dateChoice); // displayChosenOrder
@@ -175,7 +182,6 @@ public class FlooringMasteryController {
 //        }
 //        private void exportData () {
 //        }
-//    }
     }
 }
 

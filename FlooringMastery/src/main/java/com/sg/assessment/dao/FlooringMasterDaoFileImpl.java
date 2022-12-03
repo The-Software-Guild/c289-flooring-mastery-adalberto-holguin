@@ -1,6 +1,8 @@
 package com.sg.assessment.dao;
 
 import com.sg.assessment.dao.exceptions.FlooringMasteryPersistenceException;
+import com.sg.assessment.dao.exceptions.NoOrdersOnDateException;
+import com.sg.assessment.dto.Action;
 import com.sg.assessment.dto.Order;
 
 import java.io.*;
@@ -40,12 +42,15 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
     }
 
     // We will use this when adding files because we WANT TO create one if it doesn't exist
-    public void setCurrentFile(String fileName) throws FlooringMasteryPersistenceException {
+    public void setCurrentFile(String fileName, Action action) throws FlooringMasteryPersistenceException,
+            NoOrdersOnDateException {
         File checkFile = new File(fileName);
 
         // If file does not exist, creates it
-        if (!checkFile.exists()) {
+        if (!checkFile.exists() && action == Action.ADD) {
             createNewOrdersFile(fileName);
+        } else if (!checkFile.exists()) {
+            throw new NoOrdersOnDateException("There are no orders for the specified date.");
         }
         CURRENT_ORDERS_FILE = fileName;
 
@@ -68,15 +73,12 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
     }
 
 
-
-    public void loadfile(Date date){
+    public void loadfile(Date date) {
         File newFile = new File(".\\orders\\" + date);
-        if(newFile.exists()){
+        if (newFile.exists()) {
             loadOrdersFile();
         }
     }
-
-
 
 
     // correct date file has already been loaded
