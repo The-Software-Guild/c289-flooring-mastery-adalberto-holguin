@@ -127,7 +127,7 @@ public class FlooringMasteryController {
     }
 
     // Prantik
-    private void editOrder() throws Exception {
+    private void editOrder() throws FlooringMasteryPersistenceException {
         LocalDate date = view.retrieveOrderDate();
         boolean fileExists = service.FileExist(date);
 
