@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -61,6 +62,11 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
         String fileName = "Orders_" + date + ".txt";
         checkFile = dao.checkFileExist(fileName);
         return checkFile;
+    }
+
+    @Override
+    public void checkFileIsEmpty() throws IOException {
+        dao.deleteFileIfEmpty();
     }
 
     @Override
