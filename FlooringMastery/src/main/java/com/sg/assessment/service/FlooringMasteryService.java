@@ -8,6 +8,7 @@ import com.sg.assessment.dto.Product;
 import com.sg.assessment.dto.State;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -28,6 +29,8 @@ public interface FlooringMasteryService {
     void editOrder();
 
     boolean FileExist(LocalDate date);
+
+    void checkFileIsEmpty() throws IOException;
 
     BigDecimal calculateMaterialCost(Order order, BigDecimal area, BigDecimal costPerSquareFoot);
 

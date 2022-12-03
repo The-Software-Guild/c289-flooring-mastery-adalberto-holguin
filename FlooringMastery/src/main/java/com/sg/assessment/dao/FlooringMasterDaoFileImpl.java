@@ -19,6 +19,7 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
     private String CURRENT_ORDERS_FILE;
     private String STATE_FILE;
     private String PRODUCT_FILE;
+    private File ordersFile;
     public static final String DELIMITER = ",";
 
     private List<Order> ordersList = new ArrayList<>();
@@ -53,6 +54,7 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
             throw new NoOrdersOnDateException("There are no orders for the specified date.");
         }
         CURRENT_ORDERS_FILE = fileName;
+        ordersFile = new File(fileName);
 
         loadOrdersFile();
     }
@@ -72,6 +74,14 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         }
     }
 
+    @Override
+    public void deleteFileIfEmpty() throws IOException {
+        try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(ordersFile)))) {
+            scanner.nextLine();
+        } catch (NoSuchElementException e) {
+            System.out.println(ordersFile.delete());
+        }
+    }
 
     public void loadfile(Date date) {
         File newFile = new File(".\\orders\\" + date);
