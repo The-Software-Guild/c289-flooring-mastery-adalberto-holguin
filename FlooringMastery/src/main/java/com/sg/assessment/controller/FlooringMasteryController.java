@@ -32,7 +32,7 @@ public class FlooringMasteryController {
         boolean isInitialized = false;
         try {
             initializeProgram();
-            view.displayWelcomeMessage();
+            view.displayWelcomeBanner();
             isInitialized = true;
         } catch (FlooringMasteryPersistenceException e) {
             view.displayErrorMessage(e.getMessage());
@@ -65,7 +65,14 @@ public class FlooringMasteryController {
                     }
                     break;
                 case 3:
-                    //editOrder();
+                    try {
+                        editOrder();
+                    } catch (NoOrdersOnDateException e) {
+                        view.displayErrorMessage(e.getMessage());
+                    } catch (FlooringMasteryPersistenceException e) {
+                        view.displayErrorMessage(e.getMessage());
+                        isInitialized = false;
+                    }
                     break;
                 case 4:
                     removeOrder();
@@ -92,13 +99,14 @@ public class FlooringMasteryController {
         if (ordersList.size() == 0) {
             throw new NoOrdersOnDateException("There are no orders for the specified date.");
         }
-        view.displayViewAllBanner(orderDate);
+        view.displayViewAllOrdersBanner(orderDate);
         view.displayOrders(ordersList);
     }
 
     // Adalberto
     private void addOrder() throws InvalidDateException, FlooringMasteryPersistenceException, InterruptedException,
             NoOrdersOnDateException, IOException {
+        view.displayAddOrderBanner();
         LocalDate orderDate = view.retrieveOrderDate();
 
         if (orderDate.isBefore(LocalDate.now())) {
@@ -110,53 +118,59 @@ public class FlooringMasteryController {
         List<Order> ordersList = service.retrieveOrdersList(); // so we can assign correct order number using ordersList.size()
         List<State> statesList = service.retrieveStatesList();
         List<Product> productsList = service.retrieveProductsList();
-        Order newOrder = view.retrieveOrderInformation(ordersList, statesList, productsList); // retrieves order info from user
+        Order newOrder = new Order();
+        newOrder = view.retrieveOrderInformation(ordersList, statesList, productsList, Action.ADD, newOrder);
 
-        // Calculates order's material cost, labor cost, tax, and total
+        // Calculates order's material cost, labor cost, tax, and total.
         service.calculatePrices(newOrder);
 
-        // Confirming user order
-        boolean orderIsConfirmed = view.confirmOrder(newOrder);
-        if (orderIsConfirmed) {
+        // Confirming user order.
+        boolean informationIsConfirmed = view.confirmOrderInformation(newOrder);
+        if (informationIsConfirmed) {
             service.enterOrder(newOrder);
             view.displayAddOrderSuccessBanner(newOrder);
         } else {
+            // Must delete created file if user aborted order.
             service.checkFileIsEmpty();
             view.displayOrderCanceledBanner();
         }
     }
 
-    // Prantik
-    private void editOrder() throws FlooringMasteryPersistenceException {
+    private void editOrder() throws NoOrdersOnDateException, FlooringMasteryPersistenceException, InterruptedException {
+        view.displayEditOrderBanner();
         LocalDate date = view.retrieveOrderDate();
-        boolean fileExists = service.FileExist(date);
+        service.selectAndLoadOrders(date, Action.EDIT); // will exit method if date does not exist
 
-        if (fileExists) {
-            try {
-                service.selectAndLoadOrders(date, Action.EDIT);
-                List<Order> ordersList = service.retrieveOrdersList();
-
-                view.retrieveOrderToEdit(ordersList);
-                // show the fields ..and edit
-                //
-                // order.setName()
-            } catch (FlooringMasteryPersistenceException e) {
-                throw new RuntimeException(e);
-
-            }
-
+        List<Order> ordersList = service.retrieveOrdersList();
+        if (ordersList.size() == 0) {
+            throw new NoOrdersOnDateException("There are no orders for the specified date.");
         }
+        List<State> statesList = service.retrieveStatesList();
+        List<Product> productsList = service.retrieveProductsList();
+        Order orderToEdit = view.retrieveOrder(ordersList, Action.EDIT);
+        System.out.println(orderToEdit.toString());
 
+        if (orderToEdit == null) {
+            view.displayNoSuchOrderMessage();
+        } else {
+            // Creating new order to be able to compare, so that we can skip the rest of the steps if user didn't change anything.
+            Order editedOrder = view.retrieveOrderInformation(ordersList, statesList, productsList, Action.EDIT, orderToEdit);
 
-        // check that order numbers... handle if exists and if not...
+            if (orderToEdit.equals(editedOrder)) {
+                view.displayNoEditDoneMessage();
+            } else {
+                // Calculates order's material cost, labor cost, tax, and total.
+                service.calculatePrices(orderToEdit);
 
-        // ask what they wanna edit
-        // FORMAT OF MENU
-        // Enter customer name (Ada Lovelace) (or press enter to leave the same):
-        // Enter state...
-        // etc...
-
-        // if input.equals("") leave information the same
+                boolean informationIsConfirmed = view.confirmOrderInformation(orderToEdit);
+                if (informationIsConfirmed) {
+                    service.storeEditedOrder();
+                    view.displayEditOrderSuccessBanner();
+                } else {
+                    view.displayCancelEditBanner();
+                }
+            }
+        }
     }
 
     private void removeOrder() throws UnsupportedOperationException {

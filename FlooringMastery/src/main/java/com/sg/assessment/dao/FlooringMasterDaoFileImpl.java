@@ -52,13 +52,6 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         loadOrdersFile();
     }
 
-    // We will use this when displaying and/or orders, because we DO NOT want to create a new file if it doesn't exist
-    // Might need this for edit orders
-    public boolean checkFileExist(String fileName) {
-        File checkFile = new File(fileName);
-        return checkFile.exists();
-    }
-
     private void createNewOrdersFile(File newOrdersFile) throws FlooringMasteryPersistenceException {
         try {
             newOrdersFile.createNewFile();
@@ -132,18 +125,9 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
 
     }
 
-
-    // Prantik
     @Override
-    public void editOrder(int orderNumber, String newCustomerName, String newState,
-                          String newProductType, BigDecimal newArea)
-            throws UnsupportedOperationException {
-//        Order orderToEdit = getOrder(orderNumber);
-//        orderToEdit.setCustomerName(newCustomerName);
-//        orderToEdit.setState(newState); // if we edit state we have to run the service layer's
-//        orderToEdit.setProductType(newProductType);
-//        orderToEdit.setArea(newArea);
-//        writeOrdersFile();
+    public void editOrder() throws FlooringMasteryPersistenceException {
+        writeOrdersFile(ordersList);
     }
 
     //-------------------------------------

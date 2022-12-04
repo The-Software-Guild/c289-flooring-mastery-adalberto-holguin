@@ -15,11 +15,15 @@ public interface UserIO {
 
     String readNames(String prompt);
 
+    String readNamesAllowEmpty(String prompt);
+
     String formatCurrency(BigDecimal amount);
 
     int readInt(String prompt);
 
-    int readInt(String prompt, int min, int max) throws InterruptedException;
+    int readInt(String prompt, int min, int max);
+
+    int readIntAllowEmpty(String prompt, int min, int max);
 
     double readDouble(String prompt);
 
@@ -36,4 +40,6 @@ public interface UserIO {
     BigDecimal readBigDecimal(String prompt);
 
     BigDecimal readBigDecimal(String prompt, BigDecimal min, BigDecimal max);
+
+    BigDecimal readBigDecimalAllowEmpty(String prompt, BigDecimal min, BigDecimal max);
 }

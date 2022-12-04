@@ -73,6 +73,33 @@ public class UserIOConsoleImpl implements UserIO {
     }
 
     @Override
+    public String readNamesAllowEmpty(String prompt) {
+        Scanner inputReader = new Scanner(System.in);
+        String returnString;
+        while (true) {
+            boolean nameIsOk = true;
+            System.out.println(prompt);
+            if ((returnString = inputReader.nextLine().trim()).length() > 0) {
+
+                for (int i = 0; i < returnString.length(); i++) {
+                    if (!Character.isLetterOrDigit(returnString.charAt(i)) && returnString.charAt(i) != ' ' && returnString.charAt(i) != '.') {
+                        System.out.println("Customer name cannot contain special characters.");
+                        nameIsOk = false;
+                        break;
+                    }
+                }
+                // If looped through all chars in the name and found no illegal characters
+                if (nameIsOk) {
+                    return returnString;
+                }
+            } else {
+                // If user left input empty
+                return returnString;
+            }
+        }
+    }
+
+    @Override
     public String formatCurrency(BigDecimal amount) {
         return null;
     }
@@ -85,7 +112,7 @@ public class UserIOConsoleImpl implements UserIO {
     }
 
     @Override
-    public int readInt(String prompt, int min, int max) throws InterruptedException {
+    public int readInt(String prompt, int min, int max) {
         Scanner inputReader = new Scanner(System.in);
         int num;
         while (true) {
@@ -93,19 +120,40 @@ public class UserIOConsoleImpl implements UserIO {
                 do {
                     System.out.println(prompt);
                     num = Integer.parseInt(inputReader.nextLine());
-                    if (num < min || num > max) {
+                    if ((num < min || num > max) && min == max) {
+                        System.out.println("Invalid input, the only available option is " + min + ".");
+                    } else if (num < min || num > max) {
                         System.out.println("Invalid input, enter a number between " + min + " and " + max + ".");
-                        Thread.sleep(1500);
                     }
                 } while (num < min || num > max);
                 break;
             } catch (NumberFormatException e) {
                 System.out.println("Error. Please input only whole numbers for your selection.");
-                Thread.sleep(1500);
-
             }
         }
         return num;
+    }
+
+    @Override
+    public int readIntAllowEmpty(String prompt, int min, int max) {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            int num = 0;
+            try {
+                String input = scanner.nextLine();
+                if (!input.trim().equals("")) {
+                    if (Integer.parseInt(input) >= min && Integer.parseInt(input) <= max) {
+                        return num;
+                    } else {
+                        System.out.println("Invalid input, enter a number between " + min + " and " + max + ".");
+                    }
+                } else {
+                    return num; // If user left input empty (will return -1)
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid numeric input, please only enter whole numbers.");
+            }
+        }
     }
 
     @Override
@@ -185,17 +233,40 @@ public class UserIOConsoleImpl implements UserIO {
 
         while (true) {
             try {
-                do {
-                    System.out.println(prompt);
-                    num = new BigDecimal(inputReader.nextLine()).setScale(2, RoundingMode.HALF_EVEN);
-                    if (num.compareTo(min) == -1 || num.compareTo(max) == 1) {
-                        System.out.println("Invalid input, enter a number between " + min + " and " + max + ".");
-                    }
-                } while (num.compareTo(min) == -1 || num.compareTo(max) == 1);
-                return num;
+                System.out.println(prompt);
+                num = new BigDecimal(inputReader.nextLine()).setScale(2, RoundingMode.HALF_EVEN);
+                if (num.compareTo(min) == -1 || num.compareTo(max) == 1) {
+                    System.out.println("Invalid input, enter a number between " + min + " and " + max + ".");
+                } else {
+                    return num;
+                }
             } catch (NumberFormatException e) {
                 // If the user inputs something other than numbers
                 System.out.println("Invalid numeric input, please try again.");
+            }
+        }
+    }
+
+    @Override
+    public BigDecimal readBigDecimalAllowEmpty(String prompt, BigDecimal min, BigDecimal max) {
+        Scanner inputReader = new Scanner(System.in);
+        while (true) {
+            BigDecimal num = null;
+            try {
+                System.out.println(prompt);
+                String numberString = inputReader.nextLine();
+                if (numberString.trim().equals("")) {
+                    return num; // If user left input empty (will return null)
+                } else {
+                    num = new BigDecimal(numberString).setScale(2, RoundingMode.HALF_EVEN);
+                    if (num.compareTo(min) == -1 || num.compareTo(max) == 1) {
+                        System.out.println("Invalid input, enter a number between " + min + " and " + max + ".");
+                    } else {
+                        return num;
+                    }
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid numeric input, please only enter whole numbers.");
             }
         }
     }

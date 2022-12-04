@@ -22,13 +22,13 @@ public interface FlooringMasteryService {
 
 //    public void checkFile(LocalDate date);
 
+    void storeEditedOrder() throws FlooringMasteryPersistenceException;
+
     Order calculatePrices(Order order);
 
 //    public void loadfile(Date date);
 
     void editOrder();
-
-    boolean FileExist(LocalDate date);
 
     void checkFileIsEmpty() throws IOException;
 
