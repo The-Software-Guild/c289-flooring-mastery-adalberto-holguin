@@ -56,8 +56,6 @@ public interface FlooringMasteryDao {
      */
     List<Product> getProductsList();
 
-    boolean checkFileExist(String fileName);
-
     void loadfile(Date date) throws FlooringMasteryPersistenceException;
 
     /**
@@ -95,15 +93,17 @@ public interface FlooringMasteryDao {
      */
     Order removeOrder(Order o);
 
-    /**
-     * Edits properties for the order associated with the order number.
-     *
-     * @param orderNumber order number to be associated with the order.
-     * @throws UnsupportedOperationException replace later
-     */
-    void editOrder(int orderNumber, String newCustomerName, String newState,
-                   String newProductType, BigDecimal area)
-            throws UnsupportedOperationException;
+//    /**
+//     * Edits properties for the order associated with the order number.
+//     *
+//     * @param orderNumber order number to be associated with the order.
+//     * @throws UnsupportedOperationException replace later
+//     */
+//    void editOrder(int orderNumber, String newCustomerName, String newState,
+//                   String newProductType, BigDecimal area)
+//            throws UnsupportedOperationException;
+
+    void editOrder() throws FlooringMasteryPersistenceException;
 
 //
 //    /**

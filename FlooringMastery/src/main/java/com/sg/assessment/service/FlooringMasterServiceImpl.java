@@ -33,7 +33,7 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
     public void selectAndLoadOrders(LocalDate date, Action action) throws FlooringMasteryPersistenceException,
             NoOrdersOnDateException {
         //date format is ensured when collected from user
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMddYYY");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMddYYYY");
 
         String dateAsString = date.format(formatter);
         String fileName = ".\\orders\\Orders_" + dateAsString + ".txt";
@@ -56,11 +56,12 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
 
 
     public boolean FileExist(LocalDate date) {
-        //date format is ensured when collected from user
-        boolean checkFile;
-        String fileName = "Orders_" + date + ".txt";
-        checkFile = dao.checkFileExist(fileName);
-        return checkFile;
+//        //date format is ensured when collected from user
+//        boolean checkFile;
+//        String fileName = "Orders_" + date + ".txt";
+//        checkFile = dao.checkFileExist(fileName);
+//        return checkFile;
+        return true;
     }
 
     @Override
@@ -71,6 +72,11 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
     @Override
     public void enterOrder(Order order) throws FlooringMasteryPersistenceException {
         dao.addOrder(order);
+    }
+
+    @Override
+    public void storeEditedOrder() throws FlooringMasteryPersistenceException {
+        dao.editOrder();
     }
 
     @Override
@@ -141,14 +147,15 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
     @Override
     public Order removeOrder(Order removedOrder) throws UnsupportedOperationException {
         removedOrder = removeOrder(removedOrder);
-        if (removedOrder != null) {
-            dao.checkFileExist("Order #"
-                    + removedOrder.getOrderNumber() + " for date"
-                    + removedOrder.getDate() + " REMOVED");
-            return removedOrder;
-        } else {
-            throw new UnsupportedOperationException("ERROR: No orders with that number exists on that date");
-        }
+//        if (removedOrder != null) {
+//            dao.checkFileExist("Order #"
+//                    + removedOrder.getOrderNumber() + " for date"
+//                    + removedOrder.getDate() + " REMOVED");
+//            return removedOrder;
+//        } else {
+//            throw new UnsupportedOperationException("ERROR: No orders with that number exists on that date");
+//        }
+        return removedOrder;
     }
 
     @Override
