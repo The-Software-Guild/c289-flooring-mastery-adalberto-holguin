@@ -197,10 +197,6 @@ public class FlooringMasteryView {
         io.print("\n================ REMOVE ORDER ================");
     }
 
-    public void displayDateBanner(LocalDate dateChoice) {
-        System.out.printf("===== Orders on %s =====/n", dateChoice);
-    }
-
     public void displayChosenOrder(Order o) {
         if (o != null) {
             io.print(o.getProductType());
@@ -215,7 +211,18 @@ public class FlooringMasteryView {
         switch (action) {
             case ADD:
                 // Setting order number.
-                order.setOrderNumber(ordersList.size() + 1);
+                if (ordersList.size() == 0) {
+                    order.setOrderNumber(1);
+                } else {
+                    int maxOrderNumber = 0;
+                    for (Order o : ordersList) {
+                        if (o.getOrderNumber() > maxOrderNumber) {
+                            maxOrderNumber = o.getOrderNumber();
+                        }
+                    }
+                    order.setOrderNumber(maxOrderNumber + 1);
+                }
+
 
                 // Getting customer name.
                 String customerName = io.readNames("Enter customer name");

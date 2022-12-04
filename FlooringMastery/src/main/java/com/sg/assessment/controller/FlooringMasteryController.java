@@ -43,46 +43,32 @@ public class FlooringMasteryController {
             view.printMainMenu();
             mainMenuSelection = view.retrieveMainMenuSelection();
 
-            switch (mainMenuSelection) {
-                case 1:
-                    try {
+            try {
+                switch (mainMenuSelection) {
+                    case 1:
                         displayOrders();
-                    } catch (NoOrdersOnDateException e) {
-                        view.displayErrorMessage(e.getMessage());
-                    } catch (FlooringMasteryPersistenceException e) {
-                        view.displayErrorMessage(e.getMessage());
-                        isInitialized = false;
-                    }
-                    break;
-                case 2:
-                    try {
+                        break;
+                    case 2:
                         addOrder();
-                    } catch (InvalidDateException | NoOrdersOnDateException e) {
-                        view.displayErrorMessage(e.getMessage());
-                    } catch (FlooringMasteryPersistenceException | IOException e) {
-                        view.displayErrorMessage(e.getMessage());
-                        isInitialized = false;
-                    }
-                    break;
-                case 3:
-                    try {
+                        break;
+                    case 3:
                         editOrder();
-                    } catch (NoOrdersOnDateException e) {
-                        view.displayErrorMessage(e.getMessage());
-                    } catch (FlooringMasteryPersistenceException e) {
-                        view.displayErrorMessage(e.getMessage());
+                        break;
+                    case 4:
+                        removeOrder();
+                        break;
+                    case 5:
+                        //exportData();
+                        break;
+                    case 6:
                         isInitialized = false;
-                    }
-                    break;
-                case 4:
-                    removeOrder();
-                    break;
-                case 5:
-                    //exportData();
-                    break;
-                case 6:
-                    isInitialized = false;
-                    break;
+                        break;
+                }
+            } catch (NoOrdersOnDateException | InvalidDateException e) {
+                view.displayErrorMessage(e.getMessage());
+            } catch (FlooringMasteryPersistenceException | IOException e) {
+                view.displayErrorMessage(e.getMessage());
+                isInitialized = false;
             }
         }
         view.displayExitBanner();
@@ -176,30 +162,30 @@ public class FlooringMasteryController {
         }
     }
 
-    private void removeOrder() throws UnsupportedOperationException {
-        // Patrick
-//        view.displayRemoveOrderBanner();
-//        LocalDate dateChoice = view.inputDate(); // getting order date
-//        view.displayDateBanner(dateChoice); // displayChosenOrder
-//        try {
-//            int orderNumber = view.getOrderNumber(); //getting order number
-//            Order o = service.retrieveOrder(dateChoice, orderNumber); // changed from getOrder to retrieveOrder
-//            view.displayChosenOrder(o); // can be deleted, should only display chosen order
-//            view.displayRemoveOrderBanner(); // shows that the order is being removed
-//            String response = view.askRemove(); // confirms if the user wants to remove the order
-//            if (response.equalsIgnoreCase("Y")) {
-//                service.removeOrder(o);
-//                view.displayRemoverOrderSuccess(true, o);
-//            } else if (response.equalsIgnoreCase("N")) {
-//                view.displayRemoverOrderSuccess(false, o);
-//            } else {
-//                unknownCommand();
-//            }
-//        } catch (UnsupportedOperationException e) {
-//            view.displayErrorMessage();
-//        }
-//        private void exportData () {
-//        }
+    private void removeOrder() throws FlooringMasteryPersistenceException, NoOrdersOnDateException {
+        view.displayRemoveOrderBanner();
+        LocalDate dateChoice = view.retrieveOrderDate();
+        service.selectAndLoadOrders(dateChoice, Action.REMOVE);
+
+        try {
+            int orderNumber = view.getOrderNumber(); //getting order number
+            Order o = service.retrieveOrder(dateChoice, orderNumber); // changed from getOrder to retrieveOrder
+            view.displayChosenOrder(o); // can be deleted, should only display chosen order
+            view.displayRemoveOrderBanner(); // shows that the order is being removed
+            String response = view.askRemove(); // confirms if the user wants to remove the order
+            if (response.equalsIgnoreCase("Y")) {
+                service.removeOrder(o);
+                view.displayRemoverOrderSuccess(true, o);
+            } else if (response.equalsIgnoreCase("N")) {
+                view.displayRemoverOrderSuccess(false, o);
+            } else {
+                unknownCommand();
+            }
+        } catch (UnsupportedOperationException e) {
+            view.displayErrorMessage();
+        }
+        private void exportData () {
+        }
     }
 }
 
