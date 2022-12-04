@@ -148,15 +148,18 @@ public class FlooringMasteryController {
         List<State> statesList = service.retrieveStatesList();
         List<Product> productsList = service.retrieveProductsList();
         Order orderToEdit = view.retrieveOrder(ordersList, Action.EDIT);
-        System.out.println(orderToEdit.toString());
 
         if (orderToEdit == null) {
             view.displayNoSuchOrderMessage();
         } else {
-            // Creating new order to be able to compare, so that we can skip the rest of the steps if user didn't change anything.
-            Order editedOrder = view.retrieveOrderInformation(ordersList, statesList, productsList, Action.EDIT, orderToEdit);
+            // Creating an order with orderToEdit's information before it's edited, so we can compare and see if order was edited.
+            Order orderToCompare = new Order(orderToEdit.getOrderNumber(), orderToEdit.getCustomerName(),
+                    orderToEdit.getState(), orderToEdit.getTaxRate(), orderToEdit.getProductType(), orderToEdit.getArea(),
+                    orderToEdit.getCostPerSquareFoot(), orderToEdit.getLaborCostPerSquareFoot(), orderToEdit.getMaterialCost(),
+                    orderToEdit.getLaborCost(), orderToEdit.getTax(), orderToEdit.getTotal());
+            orderToEdit = view.retrieveOrderInformation(ordersList, statesList, productsList, Action.EDIT, orderToEdit);
 
-            if (orderToEdit.equals(editedOrder)) {
+            if (orderToEdit.equals(orderToCompare)) {
                 view.displayNoEditDoneMessage();
             } else {
                 // Calculates order's material cost, labor cost, tax, and total.

@@ -149,7 +149,7 @@ public class FlooringMasteryView {
     }
 
     public void displayNoEditDoneMessage() throws InterruptedException {
-        io.print("None of the order's information was edited.");
+        io.print("None of the order's information was changed.");
         Thread.sleep(1500);
     }
 
@@ -209,25 +209,16 @@ public class FlooringMasteryView {
 
     public Order retrieveOrderInformation(List<Order> ordersList, List<State> statesList, List<Product> productsList,
                                           Action action, Order order) {
-        String customerName = null;
-
-        int stateChoice = 0;
-        State state;
-        String stateAbbreviation = null;
-        BigDecimal taxRate = null;
-
-        int productChoice = 0;
-        Product product;
-        String productType = null;
-        BigDecimal costPerSquareFoot = null;
-        BigDecimal laborCostPerSquareFoot = null;
-
-        BigDecimal area = null;
+        int stateChoice; // will get index from statesList to select State
+        int productChoice; // will get index from productsList to select Product
 
         switch (action) {
             case ADD:
+                // Setting order number.
+                order.setOrderNumber(ordersList.size() + 1);
+
                 // Getting customer name.
-                customerName = io.readNames("Enter customer name");
+                String customerName = io.readNames("Enter customer name");
 
                 // Getting state abbreviation and tax rate.
                 io.print("Select a state from our list:");
@@ -235,9 +226,9 @@ public class FlooringMasteryView {
                     io.print((i + 1) + " - " + statesList.get(i).getStateName());
                 }
                 stateChoice = io.readInt("Enter your choice:", 1, statesList.size());
-                state = statesList.get(stateChoice - 1); // -1 because list starts from 1 while index starts from 0
-                stateAbbreviation = state.getStateAbbreviation();
-                taxRate = state.getTaxRate();
+                State state = statesList.get(stateChoice - 1); // -1 because list starts from 1 while index starts from 0
+                String stateAbbreviation = state.getStateAbbreviation();
+                BigDecimal taxRate = state.getTaxRate();
 
                 // Getting product type, cost per square foot, and labor cost per square foot
                 io.print("Select a product from our list:");
@@ -245,22 +236,29 @@ public class FlooringMasteryView {
                     io.print((i + 1) + " - " + productsList.get(i).getProductType());
                 }
                 productChoice = io.readInt("Enter your choice:", 1, productsList.size());
-                product = productsList.get(productChoice - 1); // -1 because list starts from 1 while index starts from 0
-                productType = product.getProductType();
-                costPerSquareFoot = product.getCostPerSquareFoot();
-                laborCostPerSquareFoot = product.getLaborCostPerSquareFoot();
+                Product product = productsList.get(productChoice - 1); // -1 because list starts from 1 while index starts from 0
+                String productType = product.getProductType();
+                BigDecimal costPerSquareFoot = product.getCostPerSquareFoot();
+                BigDecimal laborCostPerSquareFoot = product.getLaborCostPerSquareFoot();
 
                 // Getting area
-                area = io.readBigDecimal("Enter desired sq. ft. of product (minimum 100sq ft.):", new BigDecimal("100"),
-                        new BigDecimal("10000000"));
+                BigDecimal area = io.readBigDecimal("Enter desired sq. ft. of product (minimum 100sq ft.):", new BigDecimal(
+                        "100"), new BigDecimal("10000000"));
 
-                break;
+                order.setCustomerName(customerName);
+                order.setState(stateAbbreviation);
+                order.setTaxRate(taxRate);
+                order.setProductType(productType);
+                order.setArea(area);
+                order.setCostPerSquareFoot(costPerSquareFoot);
+                order.setLaborCostPerSquareFoot(laborCostPerSquareFoot);
+                return order;
             case EDIT:
                 // Changing customer name if user entered new customer name information.
                 io.print("\nEnter new data to edit, or leave blank and press enter to leave intact:");
                 String newCustomerName = io.readNamesAllowEmpty("Enter customer name (" + order.getCustomerName() + "):");
                 if (!newCustomerName.equals("")) {
-                    customerName = newCustomerName;
+                    order.setCustomerName(newCustomerName);
                 }
 
                 // Changing state abbreviation and tax rate if user entered new state information.
@@ -271,8 +269,8 @@ public class FlooringMasteryView {
                 stateChoice = io.readIntAllowEmpty("Enter state (" + order.getState() + "):", 1, statesList.size());
                 if (stateChoice != 0) { // If user changed state
                     state = statesList.get(stateChoice - 1); // -1 because list starts from 1 while index starts from 0
-                    stateAbbreviation = state.getStateAbbreviation();
-                    taxRate = state.getTaxRate();
+                    order.setState(state.getStateAbbreviation());
+                    order.setTaxRate(state.getTaxRate());
                 }
 
                 // Changing product type, cost per sq. ft., and labor cost per sq. ft. if user entered new product information.
@@ -284,29 +282,20 @@ public class FlooringMasteryView {
                         productsList.size());
                 if (productChoice != 0) {
                     product = productsList.get(productChoice - 1); // -1 because list starts from 1 while index starts from 0
-                    productType = product.getProductType();
-                    costPerSquareFoot = product.getCostPerSquareFoot();
-                    laborCostPerSquareFoot = product.getLaborCostPerSquareFoot();
+                    order.setProductType(product.getProductType());
+                    order.setCostPerSquareFoot(product.getCostPerSquareFoot());
+                    order.setLaborCostPerSquareFoot(product.getLaborCostPerSquareFoot());
                 }
 
                 // Changing area if user entered new area information.
                 BigDecimal newArea = io.readBigDecimalAllowEmpty("Enter area (" + order.getArea() + "):", new BigDecimal("100")
                         , new BigDecimal("10000000"));
                 if (newArea != null) {
-                    area = newArea;
+                    order.setArea(newArea);
                 }
 
                 break;
         }
-
-        order.setOrderNumber(ordersList.size() + 1);
-        order.setCustomerName(customerName);
-        order.setState(stateAbbreviation);
-        order.setTaxRate(taxRate);
-        order.setProductType(productType);
-        order.setArea(area);
-        order.setCostPerSquareFoot(costPerSquareFoot);
-        order.setLaborCostPerSquareFoot(laborCostPerSquareFoot);
         return order;
     }
 }
