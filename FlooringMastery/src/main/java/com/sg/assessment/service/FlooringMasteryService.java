@@ -28,8 +28,6 @@ public interface FlooringMasteryService {
 
 //    public void loadfile(Date date);
 
-    void editOrder();
-
     void checkFileIsEmpty() throws IOException;
 
     BigDecimal calculateMaterialCost(Order order, BigDecimal area, BigDecimal costPerSquareFoot);

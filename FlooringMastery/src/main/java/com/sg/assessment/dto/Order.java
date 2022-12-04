@@ -7,7 +7,6 @@ import java.util.Objects;
 public class Order {
 
     private int orderNumber;
-    private LocalDate date;
     private String customerName;
     private String state;
     private BigDecimal taxRate;
@@ -40,29 +39,12 @@ public class Order {
         this.total = total;
     }
 
-    //for creating a new order in dao
-    public Order(int orderNumber, String customerName, String state,
-                 String productType, BigDecimal area) {
-        this.orderNumber = orderNumber;
-        this.customerName = customerName;
-        this.state = state;
-        this.productType = productType;
-        this.area = area;
-    }
     public int getOrderNumber() {
         return orderNumber;
     }
 
     public void setOrderNumber(int orderNumber) {
         this.orderNumber = orderNumber;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
     }
 
     public String getCustomerName() {
@@ -157,7 +139,6 @@ public class Order {
     public String toString() {
         return "Order{" +
                 "orderNumber=" + orderNumber +
-                ", date=" + date +
                 ", customerName='" + customerName + '\'' +
                 ", state='" + state + '\'' +
                 ", taxRate=" + taxRate +
@@ -177,12 +158,16 @@ public class Order {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Order order = (Order) o;
-        return orderNumber == order.orderNumber && Objects.equals(date, order.date) && Objects.equals(customerName,
-                order.customerName) && Objects.equals(state, order.state) && Objects.equals(taxRate, order.taxRate) && Objects.equals(productType, order.productType) && Objects.equals(area, order.area) && Objects.equals(costPerSquareFoot, order.costPerSquareFoot) && Objects.equals(laborCostPerSquareFoot, order.laborCostPerSquareFoot) && Objects.equals(materialCost, order.materialCost) && Objects.equals(laborCost, order.laborCost) && Objects.equals(tax, order.tax) && Objects.equals(total, order.total);
+        return orderNumber == order.orderNumber && Objects.equals(customerName, order.customerName) && Objects.equals(state,
+                order.state) && Objects.equals(taxRate, order.taxRate) && Objects.equals(productType, order.productType)
+                && Objects.equals(area, order.area) && Objects.equals(costPerSquareFoot, order.costPerSquareFoot)
+                && Objects.equals(laborCostPerSquareFoot, order.laborCostPerSquareFoot) && Objects.equals(materialCost, order.materialCost)
+                && Objects.equals(laborCost, order.laborCost) && Objects.equals(tax, order.tax) && Objects.equals(total, order.total);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(orderNumber, date, customerName, state, taxRate, productType, area, costPerSquareFoot, laborCostPerSquareFoot, materialCost, laborCost, tax, total);
+        return Objects.hash(orderNumber, customerName, state, taxRate, productType, area, costPerSquareFoot,
+                laborCostPerSquareFoot, materialCost, laborCost, tax, total);
     }
 }

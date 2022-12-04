@@ -138,17 +138,16 @@ public class UserIOConsoleImpl implements UserIO {
     public int readIntAllowEmpty(String prompt, int min, int max) {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            int num = 0;
             try {
                 String input = scanner.nextLine();
                 if (!input.trim().equals("")) {
                     if (Integer.parseInt(input) >= min && Integer.parseInt(input) <= max) {
-                        return num;
+                        return Integer.parseInt(input);
                     } else {
                         System.out.println("Invalid input, enter a number between " + min + " and " + max + ".");
                     }
                 } else {
-                    return num; // If user left input empty (will return -1)
+                    return 0; // If user left input empty will return 0
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Invalid numeric input, please only enter whole numbers.");
