@@ -2,14 +2,12 @@ package com.sg.assessment.view;
 
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Scanner;
 
 @Component
 public class UserIOConsoleImpl implements UserIO {
-
 
     @Override
     public void print(String message) {
@@ -21,21 +19,6 @@ public class UserIOConsoleImpl implements UserIO {
         Scanner inputReader = new Scanner(System.in);
         System.out.println(prompt);
         return inputReader.nextLine().trim();
-    }
-
-    @Override
-    public String readString(String prompt, int max) {
-        boolean valid = false;
-        String result = "";
-        do {
-            result = readString(prompt);
-            if (result.length() <= max) {
-                valid = true;
-            } else {
-                System.out.printf("The entry must be %s letters or less. /n", max);
-            }
-        } while (!valid);
-        return result;
     }
 
     @Override
@@ -100,11 +83,6 @@ public class UserIOConsoleImpl implements UserIO {
     }
 
     @Override
-    public String formatCurrency(BigDecimal amount) {
-        return null;
-    }
-
-    @Override
     public int readInt(String prompt) {
         Scanner inputReader = new Scanner(System.in);
         while (true) {
@@ -159,76 +137,6 @@ public class UserIOConsoleImpl implements UserIO {
                 System.out.println("Invalid numeric input, please only enter whole numbers.");
             }
         }
-    }
-
-    @Override
-    public double readDouble(String prompt) {
-        Scanner inputReader = new Scanner(System.in);
-        System.out.println(prompt);
-        return Double.parseDouble(inputReader.nextLine());
-    }
-
-    @Override
-    public double readDouble(String prompt, double min, double max) {
-        Scanner inputReader = new Scanner(System.in);
-        double num;
-        do {
-            System.out.println(prompt);
-            num = Double.parseDouble(inputReader.nextLine());
-            if (num < min || num > max) {
-                System.out.println("Invalid input, enter a number between " + min + " and " + max + ".");
-            }
-        } while (num < min || num > max);
-        return num;
-    }
-
-    @Override
-    public float readFloat(String prompt) {
-        Scanner inputReader = new Scanner(System.in);
-        System.out.println(prompt);
-        return Float.parseFloat(inputReader.nextLine());
-    }
-
-    @Override
-    public float readFloat(String prompt, float min, float max) {
-        Scanner inputReader = new Scanner(System.in);
-        float num;
-        do {
-            System.out.println(prompt);
-            num = Float.parseFloat(inputReader.nextLine());
-            if (num < min || num > max) {
-                System.out.println("Invalid input, enter a number between " + min + " and " + max + ".");
-            }
-        } while (num < min || num > max);
-        return num;
-    }
-
-    @Override
-    public long readLong(String prompt) {
-        Scanner inputReader = new Scanner(System.in);
-        System.out.println(prompt);
-        return Long.parseLong(inputReader.nextLine());
-    }
-
-    @Override
-    public long readLong(String prompt, long min, long max) {
-        Scanner inputReader = new Scanner(System.in);
-        long num;
-        do {
-            System.out.println(prompt);
-            num = Long.parseLong(inputReader.nextLine());
-            if (num < min || num > max) {
-                System.out.println("Invalid input, enter a number between " + min + " and " + max + ".");
-            }
-        } while (num < min || num > max);
-        return num;
-    }
-
-    @Override
-    public BigDecimal readBigDecimal(String prompt) {
-        Scanner inputReader = new Scanner(System.in);
-        System.out.println(prompt);
-        return new BigDecimal(inputReader.nextLine()).setScale(2, RoundingMode.HALF_EVEN);
     }
 
     @Override
