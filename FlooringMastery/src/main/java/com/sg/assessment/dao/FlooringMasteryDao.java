@@ -7,9 +7,6 @@ import com.sg.assessment.dto.Order;
 import com.sg.assessment.dto.Product;
 import com.sg.assessment.dto.State;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.Date;
 import java.util.List;
 
 public interface FlooringMasteryDao {
@@ -22,18 +19,36 @@ public interface FlooringMasteryDao {
     void loadStatesAndProductsLists() throws FlooringMasteryPersistenceException;
 
     /**
-     * Sets the correct name of file to use for the orders, as well as populate the ordersList with orders from that file, if
-     * it contains any.
-     * If the user is adding orders for a particular date, and that date does not exist, it creates a file for them. This
-     * action only occurs when the user is adding orders, and will not occur if the user is displaying, editing, or removing.
+     * Adds a new order to the ordersList and writes the ordersList to the current Orders file.
      *
-     * @param fileName the name of the file we want to use for the orders
-     * @param action   the action the user is taking (adding, editing, deleting, or removing order)
-     * @throws FlooringMasteryPersistenceException if we cannot access the storage the user is specifying
-     * @throws NoOrdersOnDateException             if the user is trying to display orders from a particular storage, but
+     * @param order the order to be added
+     * @throws FlooringMasteryPersistenceException if there is a problem writing to the desired Orders file.
      */
-    void setCurrentOrdersFile(String fileName, Action action) throws FlooringMasteryPersistenceException,
-            NoOrdersOnDateException;
+    void addOrder(Order order) throws FlooringMasteryPersistenceException;
+
+    /**
+     * Writes the ordersList containing the edited order to the current Orders file.
+     *
+     * @throws FlooringMasteryPersistenceException
+     */
+    void editOrder() throws FlooringMasteryPersistenceException;
+
+    /**
+     * Removes the order from the ordersList and writes the ordersList to the current Orders file.
+     *
+     * @param order order number to be associated with the order.
+     * @throws UnsupportedOperationException replace later
+     */
+    void removeOrder(Order order) throws FlooringMasteryPersistenceException;
+
+    /**
+     * Deleted the currently loaded Orders file.
+     * We only run this in cases where the file is empty, like when the user began adding the first order for a specific date,
+     * but then decided to abort order placement. In this case if we do not delete the created Orders file we would be left
+     * with an empty file for that date in the program.
+     * We also run this method in case the user removed all orders for a specific date so we do not leave an empty orders file.
+     */
+    void deleteFile();
 
     /**
      * Returns a List of all Orders.
@@ -56,97 +71,18 @@ public interface FlooringMasteryDao {
      */
     List<Product> getProductsList();
 
-    void loadfile(Date date) throws FlooringMasteryPersistenceException;
-
     /**
-     * Adds a new order to the ordersList as well the current Orders file.
+     * Sets the correct name of file to use for the orders, as well as populate the ordersList with orders from that file, if
+     * it contains any.
+     * If the user is adding orders for a particular date, and that date does not exist, it creates a file for them. This will
+     * only happen when the user is ADDING orders, not when DISPLAYING, EDITING or REMOVING orders.
      *
-     * @param order the order to be added
-     * @throws FlooringMasteryPersistenceException if there is a problem writing to the desired Orders file.
+     * @param fileName the name of the file we want to use for the orders
+     * @param action   the action the user is taking (displaying, adding, editing, or removing orders); we need this to know when
+     *                 to create a new Orders file for a particular date
+     * @throws FlooringMasteryPersistenceException if we cannot access the Orders file with the date the user is specifying
+     * @throws NoOrdersOnDateException             if the date the user is specifying does not have a corresponding Orders file
      */
-    void addOrder(Order order) throws FlooringMasteryPersistenceException;
-
-    /**
-     * Deletes the current Orders file if the user created a new file to add an order, but then decided to abort the order.
-     * Also deletes the current Orders file in the case that the user has decided to delete all orders in the file.
-     * @throws IOException if there is a problem accessing the desired Orders file.
-     */
-    void deleteFileIfEmpty() throws IOException;
-
-    /**
-     * Retrieves an Order from the file by its order number and returns it.
-     * Returns null if no such order exists.
-     *
-     * @param orderNumber order number to be associated with Order.
-     * @throws UnsupportedOperationException replace later
-     */
-
-    Order getOrder(int orderNumber)
-            throws UnsupportedOperationException, FlooringMasteryPersistenceException;
-
-    /**
-     * Removes the order associated with the order number.
-     * Returns null if no such order exists.
-     *
-     * @param order order number to be associated with the order.
-     * @throws UnsupportedOperationException replace later
-     */
-    void removeOrder(Order order) throws FlooringMasteryPersistenceException;
-
-//    /**
-//     * Edits properties for the order associated with the order number.
-//     *
-//     * @param orderNumber order number to be associated with the order.
-//     * @throws UnsupportedOperationException replace later
-//     */
-//    void editOrder(int orderNumber, String newCustomerName, String newState,
-//                   String newProductType, BigDecimal area)
-//            throws UnsupportedOperationException;
-
-    void editOrder() throws FlooringMasteryPersistenceException;
-
-//
-//    /**
-//     * Edits customer name for the order associated with the order number.
-//     *
-//     * @param orderNumber order number to be associated with the order.
-//     * @param newCustomerName new Customer name to replace old.
-//     *
-//     * @throws UnsupportedOperationException replace later
-//     */
-//    void editCustomerName(int orderNumber, String newCustomerName)
-//            throws UnsupportedOperationException;
-//
-//    /**
-//     * Edits state for the order associated with the order number.
-//     *
-//     * @param orderNumber order number to be associated with the order.
-//     * @param newState new state to replace old.
-//     *
-//     * @throws UnsupportedOperationException replace later
-//     */
-//    void editState(int orderNumber, String newState)
-//            throws UnsupportedOperationException;
-//
-//    /**
-//     * Edits the product type for the order associated with the order number.
-//     *
-//     * @param orderNumber order number to be associated with the order.
-//     * @param newProductType new product to replace old.
-//     *
-//     * @throws UnsupportedOperationException replace later
-//     */
-//    void editProductType(int orderNumber, String newProductType)
-//            throws UnsupportedOperationException;
-//
-//    /**
-//     * Edits customer name for the order associated with the order number.
-//     *
-//     * @param orderNumber order number to be associated with the order.
-//     * @param newArea new area to replace old.
-//     *
-//     * @throws UnsupportedOperationException replace later
-//     */
-//    void editArea(int orderNumber, BigDecimal newArea)
-//            throws UnsupportedOperationException;
+    void setCurrentOrdersFile(String fileName, Action action) throws FlooringMasteryPersistenceException,
+            NoOrdersOnDateException;
 }
