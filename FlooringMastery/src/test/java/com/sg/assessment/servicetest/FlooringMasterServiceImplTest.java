@@ -1,6 +1,8 @@
 package com.sg.assessment.servicetest;
 
 import com.sg.assessment.dao.FlooringMasterDaoFileImpl;
+import com.sg.assessment.dao.FlooringMasteryAuditDAO;
+import com.sg.assessment.dao.FlooringMasteryAuditDAOFileImpl;
 import com.sg.assessment.dao.FlooringMasteryDao;
 import com.sg.assessment.dto.Order;
 import com.sg.assessment.service.FlooringMasterServiceImpl;
@@ -13,14 +15,14 @@ import java.math.RoundingMode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FlooringMasterServiceImplTest {
-    FlooringMasteryDao dao=new FlooringMasterDaoFileImpl();
-    FlooringMasterServiceImpl service=new FlooringMasterServiceImpl(dao);
+    FlooringMasteryDao dao = new FlooringMasterDaoFileImpl();
 
-    Order order=new Order();
+    FlooringMasteryAuditDAO auditDao = new FlooringMasteryAuditDAOFileImpl();
+    FlooringMasterServiceImpl service = new FlooringMasterServiceImpl(dao, auditDao);
+
+    Order order = new Order();
     @BeforeEach
     public void init(){
-
-        ///first case
 
         order.setOrderNumber(1);
         order.setCustomerName("sam");
@@ -44,10 +46,8 @@ public class FlooringMasterServiceImplTest {
 
     }
     @Test
-    public void testcalculatePrices(){
+    public void testCalculatePrices(){
         System.out.println(order.toString());
-
-
         assertEquals(order,service.calculatePrices(order));
     }
 
