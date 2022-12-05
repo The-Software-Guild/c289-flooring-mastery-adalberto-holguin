@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -111,7 +113,7 @@ public class FlooringMasteryController {
         service.calculatePrices(newOrder);
 
         // Confirming user order.
-        boolean informationIsConfirmed = view.confirmOrderInformation(newOrder);
+        boolean informationIsConfirmed = view.confirmAction(newOrder, Action.ADD);
         if (informationIsConfirmed) {
             service.enterOrder(newOrder);
             view.displayAddOrderSuccessBanner(newOrder);
@@ -151,7 +153,7 @@ public class FlooringMasteryController {
                 // Calculates order's material cost, labor cost, tax, and total.
                 service.calculatePrices(orderToEdit);
 
-                boolean informationIsConfirmed = view.confirmOrderInformation(orderToEdit);
+                boolean informationIsConfirmed = view.confirmAction(orderToEdit, Action.EDIT);
                 if (informationIsConfirmed) {
                     service.storeEditedOrder();
                     view.displayEditOrderSuccessBanner();
@@ -162,29 +164,28 @@ public class FlooringMasteryController {
         }
     }
 
-    private void removeOrder() throws FlooringMasteryPersistenceException, NoOrdersOnDateException {
+    private void removeOrder() throws FlooringMasteryPersistenceException, NoOrdersOnDateException, InterruptedException {
         view.displayRemoveOrderBanner();
         LocalDate dateChoice = view.retrieveOrderDate();
         service.selectAndLoadOrders(dateChoice, Action.REMOVE);
 
-        try {
-            int orderNumber = view.getOrderNumber(); //getting order number
-            Order o = service.retrieveOrder(dateChoice, orderNumber); // changed from getOrder to retrieveOrder
-            view.displayChosenOrder(o); // can be deleted, should only display chosen order
-            view.displayRemoveOrderBanner(); // shows that the order is being removed
-            String response = view.askRemove(); // confirms if the user wants to remove the order
-            if (response.equalsIgnoreCase("Y")) {
-                service.removeOrder(o);
-                view.displayRemoverOrderSuccess(true, o);
-            } else if (response.equalsIgnoreCase("N")) {
-                view.displayRemoverOrderSuccess(false, o);
-            } else {
-                unknownCommand();
-            }
-        } catch (UnsupportedOperationException e) {
-            view.displayErrorMessage();
+        List<Order> ordersList = service.retrieveOrdersList();
+        if (ordersList.size() == 0) {
+            throw new NoOrdersOnDateException("There are no orders for the specified date.");
         }
-        private void exportData () {
+
+        Order orderToRemove = view.retrieveOrder(ordersList, Action.REMOVE);
+        if (orderToRemove == null) {
+            view.displayNoSuchOrderMessage();
+        } else {
+            boolean deletionIsConfirmed = view.confirmAction(orderToRemove, Action.REMOVE);
+
+            if (deletionIsConfirmed) {
+                service.removeOrder(orderToRemove);
+                view.displayRemoveOrderSuccessBanner();
+            } else {
+                view.displayCancelRemoveBanner();
+            }
         }
     }
 }
