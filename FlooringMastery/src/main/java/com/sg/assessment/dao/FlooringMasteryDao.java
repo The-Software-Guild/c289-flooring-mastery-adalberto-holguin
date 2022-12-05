@@ -88,10 +88,10 @@ public interface FlooringMasteryDao {
      * Removes the order associated with the order number.
      * Returns null if no such order exists.
      *
-     * @param o order number to be associated with the order.
+     * @param order order number to be associated with the order.
      * @throws UnsupportedOperationException replace later
      */
-    Order removeOrder(Order o);
+    void removeOrder(Order order) throws FlooringMasteryPersistenceException;
 
 //    /**
 //     * Edits properties for the order associated with the order number.
