@@ -9,6 +9,7 @@ import com.sg.assessment.dto.Action;
 import com.sg.assessment.dto.Order;
 import com.sg.assessment.dto.Product;
 import com.sg.assessment.dto.State;
+import com.sg.assessment.service.exceptions.NoSuchOrderException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +40,7 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
         BigDecimal laborCost = order.getArea().multiply(order.getLaborCostPerSquareFoot()).setScale(2, RoundingMode.HALF_EVEN);
 
         // Getting State from statesList that matches state abbreviation in the Order, so we can calculate tax.
-        BigDecimal tax=new BigDecimal("0");
+        BigDecimal tax = new BigDecimal("0");
         for (State state : dao.getStatesList()) {
             if (state.getStateAbbreviation().equals(order.getState())) {
                 BigDecimal stateTax = state.getTaxRate().divide(new BigDecimal("100"), 15, RoundingMode.HALF_EVEN);
@@ -83,7 +84,11 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
     }
 
     @Override
-    public List<Order> retrieveOrdersList() {
+    public List<Order> retrieveOrdersList(Action action) throws NoOrdersOnDateException {
+        List<Order> ordersList = dao.getOrdersList();
+        if (ordersList.size() == 0 && !(action == Action.ADD)) {
+            throw new NoOrdersOnDateException("No orders found for the specified date.");
+        }
         return dao.getOrdersList();
     }
 
@@ -95,6 +100,16 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
     @Override
     public List<Product> retrieveProductsList() {
         return dao.getProductsList();
+    }
+
+    @Override
+    public Order retrieveOrder(int orderNumber) throws NoSuchOrderException {
+        for (Order order : dao.getOrdersList()) {
+            if (order.getOrderNumber() == orderNumber) {
+                return order;
+            }
+        }
+        throw new NoSuchOrderException("No order found with that order number for the selected date.");
     }
 
     @Override
@@ -130,7 +145,7 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
                 + date.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")), fileName);
     }
 
-    public void exportData() throws FlooringMasteryPersistenceException, NoOrdersOnDateException{
+    public void exportData() throws FlooringMasteryPersistenceException, NoOrdersOnDateException {
         dao.writeToExportFile();
     }
 

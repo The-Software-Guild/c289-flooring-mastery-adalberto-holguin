@@ -1,3 +1,0 @@
-OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot,LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total
-1,Selena,CA,25.00,Laminate,332.00,1.75,2.10,581.0000,697.2000,319.55,1597.7500
-2,Ok,WA,9.25,Tile,123.00,3.50,4.15,430.5000,510.4500,87.04,1027.9900
