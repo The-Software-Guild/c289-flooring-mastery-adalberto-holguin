@@ -33,6 +33,13 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         EXPORT_FILE = new File(".\\backup\\DataExport.txt");
     }
 
+    // This Constructor used for testing.
+    public FlooringMasterDaoFileImpl(File testFile) {
+        currentOrdersFile = testFile;
+        STATE_FILE = new File(".\\data\\Taxes.txt");
+        PRODUCT_FILE = new File(".\\data\\Products.txt");
+    }
+
     @Override
     public void loadStatesAndProductsLists() throws FlooringMasteryPersistenceException {
         loadStateFile();
