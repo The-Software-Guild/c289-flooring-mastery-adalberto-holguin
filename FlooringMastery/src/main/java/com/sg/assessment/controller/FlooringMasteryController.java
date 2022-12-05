@@ -14,8 +14,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -82,7 +80,7 @@ public class FlooringMasteryController {
 
     private void displayOrders() throws FlooringMasteryPersistenceException, NoOrdersOnDateException {
         LocalDate orderDate = view.retrieveOrderDate();
-        service.selectAndLoadOrders(orderDate, Action.DISPLAY);
+        service.setOrdersFile(orderDate, Action.DISPLAY);
         List<Order> ordersList = service.retrieveOrdersList();
         if (ordersList.size() == 0) {
             throw new NoOrdersOnDateException("There are no orders for the specified date.");
@@ -91,7 +89,6 @@ public class FlooringMasteryController {
         view.displayOrders(ordersList);
     }
 
-    // Adalberto
     private void addOrder() throws InvalidDateException, FlooringMasteryPersistenceException, InterruptedException,
             NoOrdersOnDateException, IOException {
         view.displayAddOrderBanner();
@@ -100,7 +97,7 @@ public class FlooringMasteryController {
         if (orderDate.isBefore(LocalDate.now())) {
             throw new InvalidDateException("Error, invalid date. New orders cannot be added to past dates.");
         } else {
-            service.selectAndLoadOrders(orderDate, Action.ADD); // assigning order to correct file, creates if does not exist
+            service.setOrdersFile(orderDate, Action.ADD); // assigning order to correct file, creates if does not exist
         }
 
         List<Order> ordersList = service.retrieveOrdersList(); // so we can assign correct order number using ordersList.size()
@@ -118,8 +115,11 @@ public class FlooringMasteryController {
             service.enterOrder(newOrder);
             view.displayAddOrderSuccessBanner(newOrder);
         } else {
-            // Must delete created file if user aborted order.
-            service.checkFileIsEmpty();
+            // If ordersList size is 0 that means this was going to be the first order added to the loaded Orders file, so now
+            // that the order is aborted, we must delete that file, otherwise we would leave an empty Orders file in the program.
+            if (ordersList.size() == 0) {
+                service.deleteEmptyFile();
+            }
             view.displayOrderCanceledBanner();
         }
     }
@@ -127,7 +127,7 @@ public class FlooringMasteryController {
     private void editOrder() throws NoOrdersOnDateException, FlooringMasteryPersistenceException, InterruptedException {
         view.displayEditOrderBanner();
         LocalDate date = view.retrieveOrderDate();
-        service.selectAndLoadOrders(date, Action.EDIT); // will exit method if date does not exist
+        service.setOrdersFile(date, Action.EDIT); // will exit method if date does not exist
 
         List<Order> ordersList = service.retrieveOrdersList();
         if (ordersList.size() == 0) {
@@ -167,7 +167,7 @@ public class FlooringMasteryController {
     private void removeOrder() throws FlooringMasteryPersistenceException, NoOrdersOnDateException, InterruptedException {
         view.displayRemoveOrderBanner();
         LocalDate dateChoice = view.retrieveOrderDate();
-        service.selectAndLoadOrders(dateChoice, Action.REMOVE);
+        service.setOrdersFile(dateChoice, Action.REMOVE);
 
         List<Order> ordersList = service.retrieveOrdersList();
         if (ordersList.size() == 0) {
@@ -182,6 +182,11 @@ public class FlooringMasteryController {
 
             if (deletionIsConfirmed) {
                 service.removeOrder(orderToRemove);
+                // If ordersList size is 0 after order removal, we've removed all orders for that date and can delete the
+                // loaded Orders file.
+                if (ordersList.size() == 0) {
+                    service.deleteEmptyFile();
+                }
                 view.displayRemoveOrderSuccessBanner();
             } else {
                 view.displayCancelRemoveBanner();

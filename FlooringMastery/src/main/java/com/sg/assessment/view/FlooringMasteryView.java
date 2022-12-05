@@ -24,14 +24,18 @@ public class FlooringMasteryView {
         this.io = io;
     }
 
-    //----------------------------------------------
-    // METHODS TO GET/RETRIEVE INFORMATION FROM USER
-    //----------------------------------------------
-    public int retrieveMainMenuSelection() {
-        return io.readInt("\nPlease choose an option from the menu: ", 1, 6);
+    public void printMainMenu() {
+        io.print("\n* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
+        io.print("* <<Flooring Program>>");
+        io.print("* 1. Display Orders");
+        io.print("* 2. Add an Order");
+        io.print("* 3. Edit an Order");
+        io.print("* 4. Remove an Order");
+        io.print("* 5. Export All Data");
+        io.print("* 6. Quit");
+        io.print("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
     }
 
-    // Whenever we need the order date for editing/adding/removing order etc.
     public LocalDate retrieveOrderDate() {
         while (true) {
             try {
@@ -44,11 +48,19 @@ public class FlooringMasteryView {
         }
     }
 
-    //editorder //removeorder
-    public String getdate() {
-        String date = io.readString("Enter the order date");
-        return date;
-
+    public void displayOrders(List<Order> orderList) {
+        for (Order order : orderList) {
+            io.print("Order Number: " + order.getOrderNumber());
+            displayDivider();
+            io.print("Customer Name: " + order.getCustomerName());
+            io.print("State: " + order.getState());
+            io.print("Product Type: " + order.getProductType());
+            io.print("Area: " + order.getArea() + " sq. ft.");
+            io.print("Material Cost: $" + order.getMaterialCost());
+            io.print("Labor Cost: $" + order.getLaborCost());
+            io.print("Tax: $" + order.getTax());
+            io.print("Total: $" + order.getTotal() + "\n");
+        }
     }
 
     public Order retrieveOrder(List<Order> ordersList, Action action) {
@@ -68,161 +80,6 @@ public class FlooringMasteryView {
             }
         }
         return null;
-    }
-
-    public String askRemove() {
-        return io.readString("\nWould you like to remove this order? Y/N", 1);
-    }
-
-    //-------------------------------------------------
-    // METHODS FOR DISPLAYING INFORMATION/MENUS TO USER
-    //-------------------------------------------------
-    public void printMainMenu() {
-        io.print("\n* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
-        io.print("* <<Flooring Program>>");
-        io.print("* 1. Display Orders");
-        io.print("* 2. Add an Order");
-        io.print("* 3. Edit an Order");
-        io.print("* 4. Remove an Order");
-        io.print("* 5. Export All Data");
-        io.print("* 6. Quit");
-        io.print("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
-    }
-
-    public void displayOrders(List<Order> orderList) {
-        for (Order order : orderList) {
-            io.print("Order Number: " + order.getOrderNumber());
-            displayDivider();
-            io.print("Customer Name: " + order.getCustomerName());
-            io.print("State: " + order.getState());
-            io.print("Product Type: " + order.getProductType());
-            io.print("Area: " + order.getArea() + " sq. ft.");
-            io.print("Material Cost: $" + order.getMaterialCost());
-            io.print("Labor Cost: $" + order.getLaborCost());
-            io.print("Tax: $" + order.getTax());
-            io.print("Total: $" + order.getTotal() + "\n");
-        }
-    }
-
-    public boolean confirmAction(Order order, Action action) {
-        io.print("\nOrder Review");
-        io.print("\nOrder Number: " + order.getOrderNumber());
-        io.print("Customer Name: " + order.getCustomerName());
-        io.print("State: " + order.getState());
-        io.print("Product Type: " + order.getProductType());
-        io.print("Area: " + order.getArea() + " sq. ft.");
-        io.print("Material Cost: $" + order.getMaterialCost());
-        io.print("Labor Cost: $" + order.getLaborCost());
-        io.print("Tax: $" + order.getTax());
-        io.print("Total: $" + order.getTotal());
-
-        int userChoice = 0;
-        switch (action) {
-            case ADD:
-                userChoice = io.readInt("\nConfirm order placement     1) YES     2) NO", 1, 2);
-                break;
-            case EDIT:
-                userChoice = io.readInt("\nConfirm new order information:     1) YES     2) NO", 1, 2);
-                break;
-            case REMOVE:
-                userChoice = io.readInt("\nConfirm order deletion:     1) YES     2) NO", 1, 2);
-                break;
-        }
-        if (userChoice == 1) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public void displayDivider() {
-        io.print("-------------------");
-    }
-
-    //----------------------------------------
-    // METHODS FOR DISPLAYING MESSAGES/BANNERS
-    //----------------------------------------
-    public void displayErrorMessage(String errorMsg) throws InterruptedException {
-        io.print("\n" + errorMsg);
-        Thread.sleep(1500);
-    }
-
-    public void displayWelcomeBanner() {
-        io.print("\n~*~*~*~*~*~* WELCOME TO THE FLOORING MASTERY PROGRAM *~*~*~*~*~*~");
-    }
-
-    public void displayExitBanner() {
-        io.print("\nThank you for using the Flooring Mastery Program! Goodbye!!");
-    }
-
-    public void displayNoSuchOrderMessage() throws InterruptedException {
-        io.print("\nNo order exists with that order number for the selected date.");
-        Thread.sleep(1500);
-    }
-
-    public void displayNoEditDoneMessage() throws InterruptedException {
-        io.print("None of the order's information was changed.");
-        Thread.sleep(1500);
-    }
-
-    public void displayRemoverOrderSuccess(boolean success, Order o) {
-        if (success == true) {
-            io.print("Order #" + o.getOrderNumber() + " was successfully removed!");
-        } else {
-            io.print("Order was not removed.");
-        }
-    }
-
-    public void displayViewAllOrdersBanner(LocalDate currentDate) {
-        io.print("\n===== ORDERS FOR " + currentDate + " =====");
-    }
-
-    public void displayAddOrderBanner() {
-        io.print("\n================ ADD ORDER ================");
-    }
-
-    public void displayAddOrderSuccessBanner(Order order) throws InterruptedException {
-        io.print("\nOrder added successfully. Order number: " + order.getOrderNumber());
-        Thread.sleep(1500);
-    }
-
-    public void displayRemoveOrderSuccessBanner() throws InterruptedException {
-        io.print("\nOrder removed successfully.");
-        Thread.sleep(1500);
-    }
-
-    public void displayOrderCanceledBanner() throws InterruptedException {
-        io.print("\nOrder has been cancelled.");
-        Thread.sleep(1500);
-    }
-
-    public void displayEditOrderBanner() {
-        io.print("\n================ EDIT ORDER ================");
-    }
-
-    public void displayEditOrderSuccessBanner() throws InterruptedException {
-        io.print("\nOrder edited successfully.");
-        Thread.sleep(1500);
-    }
-
-    public void displayCancelEditBanner() throws InterruptedException {
-        io.print("\nOrder editing cancelled.");
-        Thread.sleep(1500);
-    }
-
-    public void displayRemoveOrderBanner() {
-        io.print("\n================ REMOVE ORDER ================");
-    }
-
-    public void displayCancelRemoveBanner() throws InterruptedException {
-        io.print("\nOrder removal cancelled.");
-        Thread.sleep(1500);
-    }
-
-    public void displayChosenOrder(Order o) {
-        if (o != null) {
-            io.print(o.getProductType());
-        }
     }
 
     public Order retrieveOrderInformation(List<Order> ordersList, List<State> statesList, List<Product> productsList,
@@ -326,6 +183,114 @@ public class FlooringMasteryView {
                 break;
         }
         return order;
+    }
+
+    public boolean confirmAction(Order order, Action action) {
+        io.print("\nOrder Review");
+        io.print("\nOrder Number: " + order.getOrderNumber());
+        io.print("Customer Name: " + order.getCustomerName());
+        io.print("State: " + order.getState());
+        io.print("Product Type: " + order.getProductType());
+        io.print("Area: " + order.getArea() + " sq. ft.");
+        io.print("Material Cost: $" + order.getMaterialCost());
+        io.print("Labor Cost: $" + order.getLaborCost());
+        io.print("Tax: $" + order.getTax());
+        io.print("Total: $" + order.getTotal());
+
+        int userChoice = 0;
+        switch (action) {
+            case ADD:
+                userChoice = io.readInt("\nConfirm order placement     1) YES     2) NO", 1, 2);
+                break;
+            case EDIT:
+                userChoice = io.readInt("\nConfirm new order information:     1) YES     2) NO", 1, 2);
+                break;
+            case REMOVE:
+                userChoice = io.readInt("\nConfirm order deletion:     1) YES     2) NO", 1, 2);
+                break;
+        }
+        if (userChoice == 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public int retrieveMainMenuSelection() {
+        return io.readInt("\nPlease choose an option from the menu: ", 1, 6);
+    }
+
+    public void displayAddOrderSuccessBanner(Order order) throws InterruptedException {
+        io.print("\nOrder added successfully. Order number: " + order.getOrderNumber());
+        Thread.sleep(1500);
+    }
+
+    public void displayOrderCanceledBanner() throws InterruptedException {
+        io.print("\nOrder has been cancelled.");
+        Thread.sleep(1500);
+    }
+
+    public void displayEditOrderSuccessBanner() throws InterruptedException {
+        io.print("\nOrder edited successfully.");
+        Thread.sleep(1500);
+    }
+
+    public void displayCancelEditBanner() throws InterruptedException {
+        io.print("\nOrder editing cancelled.");
+        Thread.sleep(1500);
+    }
+
+    public void displayRemoveOrderSuccessBanner() throws InterruptedException {
+        io.print("\nOrder removed successfully.");
+        Thread.sleep(1500);
+    }
+
+    public void displayCancelRemoveBanner() throws InterruptedException {
+        io.print("\nOrder removal cancelled.");
+        Thread.sleep(1500);
+    }
+
+    public void displayErrorMessage(String errorMsg) throws InterruptedException {
+        io.print("\n" + errorMsg);
+        Thread.sleep(1500);
+    }
+
+    public void displayNoSuchOrderMessage() throws InterruptedException {
+        io.print("\nNo order exists with that order number for the selected date.");
+        Thread.sleep(1500);
+    }
+
+    public void displayNoEditDoneMessage() throws InterruptedException {
+        io.print("None of the order's information was changed.");
+        Thread.sleep(1500);
+    }
+
+    public void displayWelcomeBanner() {
+        io.print("\n~*~*~*~*~*~* WELCOME TO THE FLOORING MASTERY PROGRAM *~*~*~*~*~*~");
+    }
+
+    public void displayDivider() {
+        io.print("-------------------");
+    }
+
+    public void displayExitBanner() {
+        io.print("\nThank you for using the Flooring Mastery Program! Goodbye!!");
+    }
+
+    public void displayViewAllOrdersBanner(LocalDate currentDate) {
+        io.print("\n===== ORDERS FOR " + currentDate + " =====");
+    }
+
+    public void displayAddOrderBanner() {
+        io.print("\n================ ADD ORDER ================");
+    }
+
+    public void displayEditOrderBanner() {
+        io.print("\n================ EDIT ORDER ================");
+    }
+
+    public void displayRemoveOrderBanner() {
+        io.print("\n================ REMOVE ORDER ================");
     }
 }
 

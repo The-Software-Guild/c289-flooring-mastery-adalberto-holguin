@@ -35,126 +35,6 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         loadProductFile();
     }
 
-    // We will use this when adding files because we WANT TO create one if it doesn't exist
-    public void setCurrentOrdersFile(String fileName, Action action) throws FlooringMasteryPersistenceException,
-            NoOrdersOnDateException {
-        currentOrdersFile = new File(fileName);
-
-        // If the user wants to add an order, and the Orders file for that date doesn't exist, creates it.
-        if (action == Action.ADD) {
-            if (!currentOrdersFile.exists()) {
-                createNewOrdersFile(currentOrdersFile);
-            }
-        } else if (!currentOrdersFile.exists()) {
-            throw new NoOrdersOnDateException("There are no orders for the specified date.");
-        }
-
-        loadOrdersFile();
-    }
-
-    private void createNewOrdersFile(File newOrdersFile) throws FlooringMasteryPersistenceException {
-        try {
-            newOrdersFile.createNewFile();
-        } catch (IOException e) {
-            throw new FlooringMasteryPersistenceException("Error accessing orders file.");
-        }
-    }
-
-    @Override
-    public void deleteFileIfEmpty() throws IOException {
-        try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(currentOrdersFile)))) {
-            scanner.nextLine();
-        } catch (NoSuchElementException e) { // the created orders file is empty (user aborted order)
-            currentOrdersFile.delete();
-        }
-    }
-
-    // ??
-    public void loadfile(Date date) throws FlooringMasteryPersistenceException {
-        File newFile = new File(".\\orders\\" + date);
-        if (newFile.exists()) {
-            loadOrdersFile();
-        }
-    }
-
-    @Override
-    public List<Order> getOrdersList() {
-        return ordersList;
-    }
-
-    @Override
-    public List<State> getStatesList() {
-        return statesList;
-    }
-
-    @Override
-    public List<Product> getProductsList() {
-        return productsList;
-    }
-
-    @Override
-    public void addOrder(Order newOrder) throws FlooringMasteryPersistenceException {
-        ordersList.add(newOrder);
-        writeOrdersFile(ordersList);
-    }
-
-    // ??
-    @Override
-    public Order getOrder(int orderNumber) throws FlooringMasteryPersistenceException {
-        loadOrdersFile();
-        return ordersList.get(orderNumber);
-    }
-
-    @Override
-    public void removeOrder(Order order) throws FlooringMasteryPersistenceException {
-        ordersList.remove(order);
-        writeOrdersFile(ordersList);
-    }
-
-    @Override
-    public void editOrder() throws FlooringMasteryPersistenceException {
-        writeOrdersFile(ordersList);
-    }
-
-    //-------------------------------------
-    // METHODS FOR READING/WRITING TO FILES
-    //-------------------------------------
-    private void writeOrdersFile(List<Order> orderList) throws FlooringMasteryPersistenceException {
-        try (PrintWriter out = new PrintWriter(new FileWriter(currentOrdersFile))) {
-            String ordersFileHeader = "OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot," +
-                    "LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total";
-            out.println(ordersFileHeader);
-
-            for (Order order : orderList) {
-                String orderAsText = marshallOrder(order);
-                out.println(orderAsText);
-                out.flush();
-            }
-        } catch (IOException e) {
-            throw new FlooringMasteryPersistenceException("Error. Could not write order data to file.");
-        }
-    }
-
-    private void loadOrdersFile() throws FlooringMasteryPersistenceException {
-        // Clearing list, so it can be populated with current information as we changed Orders file or edited its contents.
-        ordersList.clear();
-
-        try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(currentOrdersFile)))) {
-            // Getting rid of the Orders file header, so we do not add it to the ordersList
-            if (scanner.hasNextLine()) {
-                scanner.nextLine();
-            }
-
-            while (scanner.hasNextLine()) {
-                String currentLine = scanner.nextLine();
-                Order currentOrder = unmarshallOrder(currentLine);
-                ordersList.add(currentOrder);
-            }
-        } catch (FileNotFoundException e) {
-            throw new FlooringMasteryPersistenceException("Could not load file into memory.");
-        }
-    }
-
     private void loadProductFile() throws FlooringMasteryPersistenceException {
         try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(PRODUCT_FILE)))) {
             // Getting rid of the Products file header, so we do not add it to the productsList
@@ -187,9 +67,103 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         }
     }
 
-    //-------------------------------------------
-    // METHODS FOR DATA MARSHALLING/UNMARSHALLING
-    //-------------------------------------------
+    @Override
+    public void setCurrentOrdersFile(String fileName, Action action) throws FlooringMasteryPersistenceException,
+            NoOrdersOnDateException {
+        currentOrdersFile = new File(fileName);
+
+        // If the user wants to add an order, and the Orders file for that date doesn't exist, creates it.
+        if (action == Action.ADD) {
+            if (!currentOrdersFile.exists()) {
+                createNewOrdersFile(currentOrdersFile);
+            }
+        } else if (!currentOrdersFile.exists()) {
+            throw new NoOrdersOnDateException("There are no orders for the specified date.");
+        }
+        loadOrdersFile();
+    }
+
+    private void createNewOrdersFile(File newOrdersFile) throws FlooringMasteryPersistenceException {
+        try {
+            newOrdersFile.createNewFile();
+        } catch (IOException e) {
+            throw new FlooringMasteryPersistenceException("Error accessing orders file.");
+        }
+    }
+
+    private void loadOrdersFile() throws FlooringMasteryPersistenceException {
+        // Clearing list, so it can be populated with current information as we changed Orders file or edited its contents.
+        ordersList.clear();
+
+        try (Scanner scanner = new Scanner(new BufferedReader(new FileReader(currentOrdersFile)))) {
+            // Getting rid of the Orders file header, so we do not add it to the ordersList
+            if (scanner.hasNextLine()) {
+                scanner.nextLine();
+            }
+
+            while (scanner.hasNextLine()) {
+                String currentLine = scanner.nextLine();
+                Order currentOrder = unmarshallOrder(currentLine);
+                ordersList.add(currentOrder);
+            }
+        } catch (FileNotFoundException e) {
+            throw new FlooringMasteryPersistenceException("Could not load file into memory.");
+        }
+    }
+
+    @Override
+    public void addOrder(Order newOrder) throws FlooringMasteryPersistenceException {
+        ordersList.add(newOrder);
+        writeOrdersFile(ordersList);
+    }
+
+    @Override
+    public void editOrder() throws FlooringMasteryPersistenceException {
+        writeOrdersFile(ordersList);
+    }
+
+    @Override
+    public void removeOrder(Order order) throws FlooringMasteryPersistenceException {
+        ordersList.remove(order);
+        writeOrdersFile(ordersList);
+    }
+
+    private void writeOrdersFile(List<Order> orderList) throws FlooringMasteryPersistenceException {
+        try (PrintWriter out = new PrintWriter(new FileWriter(currentOrdersFile))) {
+            String ordersFileHeader = "OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot," +
+                    "LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total";
+            out.println(ordersFileHeader);
+
+            for (Order order : orderList) {
+                String orderAsText = marshallOrder(order);
+                out.println(orderAsText);
+                out.flush();
+            }
+        } catch (IOException e) {
+            throw new FlooringMasteryPersistenceException("Error. Could not write order data to file.");
+        }
+    }
+
+    @Override
+    public void deleteFile() {
+        currentOrdersFile.delete();
+    }
+
+    @Override
+    public List<Order> getOrdersList() {
+        return ordersList;
+    }
+
+    @Override
+    public List<State> getStatesList() {
+        return statesList;
+    }
+
+    @Override
+    public List<Product> getProductsList() {
+        return productsList;
+    }
+
     private String marshallOrder(Order order) {
         String orderAsText = order.getOrderNumber() + DELIMITER;
         orderAsText += order.getCustomerName() + DELIMITER;
