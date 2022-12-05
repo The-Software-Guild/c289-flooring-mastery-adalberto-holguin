@@ -85,4 +85,12 @@ public interface FlooringMasteryDao {
      */
     void setCurrentOrdersFile(String fileName, Action action) throws FlooringMasteryPersistenceException,
             NoOrdersOnDateException;
+
+    /**
+     * Writes all active orders to the DataExport.txt file under backup folder.
+     *
+     * @throws FlooringMasteryPersistenceException if we cannot access the Orders file with the date the user is specifying
+     * @throws NoOrdersOnDateException             if the date the user is specifying does not have a corresponding Orders file
+     */
+    void writeToExportFile() throws FlooringMasteryPersistenceException, NoOrdersOnDateException;
 }

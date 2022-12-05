@@ -100,5 +100,8 @@ public interface FlooringMasteryService {
      * Calls the DAO method that deletes the current Orders file if there are no orders in it.
      */
     void deleteEmptyFile();
+
+    //test
+    void exportData() throws FlooringMasteryPersistenceException, NoOrdersOnDateException;
 }
 

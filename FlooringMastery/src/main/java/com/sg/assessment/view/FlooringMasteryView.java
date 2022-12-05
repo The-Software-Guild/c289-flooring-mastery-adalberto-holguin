@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.sg.assessment.dto.Order;
 
+import java.io.File;
 import java.math.BigDecimal;
 
 import java.time.LocalDate;
@@ -48,7 +49,8 @@ public class FlooringMasteryView {
         }
     }
 
-    public void displayOrders(List<Order> orderList) {
+    public void displayOrders(List<Order> orderList) throws InterruptedException{
+
         for (Order order : orderList) {
             io.print("Order Number: " + order.getOrderNumber());
             displayDivider();
@@ -61,6 +63,7 @@ public class FlooringMasteryView {
             io.print("Tax: $" + order.getTax());
             io.print("Total: $" + order.getTotal() + "\n");
         }
+        Thread.sleep(1500);
     }
 
     public Order retrieveOrder(List<Order> ordersList, Action action) {
@@ -281,6 +284,9 @@ public class FlooringMasteryView {
         io.print("\n===== ORDERS FOR " + currentDate + " =====");
     }
 
+    public void displayExportDataSuccessBanner() {
+        io.readString("All data was exported successfully. Please refer to DataExport.txt and hit any key to continue.");
+    }
     public void displayAddOrderBanner() {
         io.print("\n================ ADD ORDER ================");
     }

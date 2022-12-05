@@ -130,6 +130,10 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
                 + date.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")), fileName);
     }
 
+    public void exportData() throws FlooringMasteryPersistenceException, NoOrdersOnDateException{
+        dao.writeToExportFile();
+    }
+
     @Override
     public void deleteEmptyFile() {
         dao.deleteFile();
