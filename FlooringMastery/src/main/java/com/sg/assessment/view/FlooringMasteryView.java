@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.sg.assessment.dto.Order;
 
-import java.io.File;
 import java.math.BigDecimal;
 
 import java.time.LocalDate;
@@ -49,7 +48,7 @@ public class FlooringMasteryView {
         }
     }
 
-    public void displayOrders(List<Order> orderList) throws InterruptedException{
+    public void displayOrders(List<Order> orderList) {
 
         for (Order order : orderList) {
             io.print("Order Number: " + order.getOrderNumber());
@@ -63,10 +62,10 @@ public class FlooringMasteryView {
             io.print("Tax: $" + order.getTax());
             io.print("Total: $" + order.getTotal() + "\n");
         }
-        Thread.sleep(1500);
+        io.readString("Press enter to continue.");
     }
 
-    public Order retrieveOrder(List<Order> ordersList, Action action) {
+    public int retrieveOrderNumber(Action action) {
         int orderNumber = 0;
         switch (action) {
             case EDIT:
@@ -76,13 +75,7 @@ public class FlooringMasteryView {
                 orderNumber = io.readInt("\nEnter the number of the order you wish to remove:");
                 break;
         }
-        // Look for the order with that number, if none match, return null
-        for (Order order : ordersList) {
-            if (order.getOrderNumber() == orderNumber) {
-                return order;
-            }
-        }
-        return null;
+        return orderNumber;
     }
 
     public Order retrieveOrderInformation(List<Order> ordersList, List<State> statesList, List<Product> productsList,
@@ -223,34 +216,34 @@ public class FlooringMasteryView {
         return io.readInt("\nPlease choose an option from the menu: ", 1, 6);
     }
 
-    public void displayAddOrderSuccessBanner(Order order) throws InterruptedException {
+    public void displayAddOrderSuccessBanner(Order order) {
         io.print("\nOrder added successfully. Order number: " + order.getOrderNumber());
-        Thread.sleep(1500);
+        io.readString("Press enter to continue.");
     }
 
-    public void displayOrderCanceledBanner() throws InterruptedException {
+    public void displayOrderCanceledBanner() {
         io.print("\nOrder has been cancelled.");
-        Thread.sleep(1500);
+        io.readString("Press enter to continue.");
     }
 
-    public void displayEditOrderSuccessBanner() throws InterruptedException {
+    public void displayEditOrderSuccessBanner() {
         io.print("\nOrder edited successfully.");
-        Thread.sleep(1500);
+        io.readString("Press enter to continue.");
     }
 
-    public void displayCancelEditBanner() throws InterruptedException {
+    public void displayCancelEditBanner() {
         io.print("\nOrder editing cancelled.");
-        Thread.sleep(1500);
+        io.readString("Press enter to continue.");
     }
 
-    public void displayRemoveOrderSuccessBanner() throws InterruptedException {
+    public void displayRemoveOrderSuccessBanner() {
         io.print("\nOrder removed successfully.");
-        Thread.sleep(1500);
+        io.readString("Press enter to continue.");
     }
 
-    public void displayCancelRemoveBanner() throws InterruptedException {
+    public void displayCancelRemoveBanner() {
         io.print("\nOrder removal cancelled.");
-        Thread.sleep(1500);
+        io.readString("Press enter to continue.");
     }
 
     public void displayErrorMessage(String errorMsg) throws InterruptedException {
@@ -258,14 +251,14 @@ public class FlooringMasteryView {
         Thread.sleep(1500);
     }
 
-    public void displayNoSuchOrderMessage() throws InterruptedException {
-        io.print("\nNo order exists with that order number for the selected date.");
-        Thread.sleep(1500);
+    public void displayNoSuchOrderMessage() {
+        io.print("\nNo order found with that order number for the selected date.");
+        io.readString("Press enter to continue.");
     }
 
-    public void displayNoEditDoneMessage() throws InterruptedException {
+    public void displayNoEditDoneMessage() {
         io.print("None of the order's information was changed.");
-        Thread.sleep(1500);
+        io.readString("Press enter to continue.");
     }
 
     public void displayWelcomeBanner() {
