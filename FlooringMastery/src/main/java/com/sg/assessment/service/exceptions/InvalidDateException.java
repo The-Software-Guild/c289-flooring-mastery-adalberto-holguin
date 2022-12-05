@@ -1,4 +1,4 @@
-package com.sg.assessment.controller.exceptions;
+package com.sg.assessment.service.exceptions;
 
 public class InvalidDateException extends Exception {
 

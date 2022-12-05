@@ -1,6 +1,6 @@
 package com.sg.assessment.controller;
 
-import com.sg.assessment.controller.exceptions.InvalidDateException;
+import com.sg.assessment.service.exceptions.InvalidDateException;
 import com.sg.assessment.dao.exceptions.FlooringMasteryPersistenceException;
 import com.sg.assessment.dao.exceptions.NoOrdersOnDateException;
 import com.sg.assessment.dto.Action;
@@ -94,11 +94,12 @@ public class FlooringMasteryController {
         view.displayAddOrderBanner();
         LocalDate orderDate = view.retrieveOrderDate();
 
-        if (orderDate.isBefore(LocalDate.now())) {
-            throw new InvalidDateException("Error, invalid date. New orders cannot be added to past dates.");
-        } else {
-            service.setOrdersFile(orderDate, Action.ADD); // assigning order to correct file, creates if does not exist
-        }
+        // Order date must be in the future when adding new orders, will throw Exception if it is not.
+        service.verifyDate(orderDate);
+
+        // Assigning order to correct file, creates an Orders file for the specified date if one does not exist.
+        service.setOrdersFile(orderDate, Action.ADD);
+
 
         List<Order> ordersList = service.retrieveOrdersList(); // so we can assign correct order number using ordersList.size()
         List<State> statesList = service.retrieveStatesList();
@@ -112,7 +113,7 @@ public class FlooringMasteryController {
         // Confirming user order.
         boolean informationIsConfirmed = view.confirmAction(newOrder, Action.ADD);
         if (informationIsConfirmed) {
-            service.enterOrder(newOrder);
+            service.enterOrder(newOrder, orderDate);
             view.displayAddOrderSuccessBanner(newOrder);
         } else {
             // If ordersList size is 0 that means this was going to be the first order added to the loaded Orders file, so now
@@ -127,7 +128,7 @@ public class FlooringMasteryController {
     private void editOrder() throws NoOrdersOnDateException, FlooringMasteryPersistenceException, InterruptedException {
         view.displayEditOrderBanner();
         LocalDate date = view.retrieveOrderDate();
-        service.setOrdersFile(date, Action.EDIT); // will exit method if date does not exist
+        service.setOrdersFile(date, Action.EDIT); // will throw exception if Orders file does not exist for specified date
 
         List<Order> ordersList = service.retrieveOrdersList();
         if (ordersList.size() == 0) {
@@ -155,7 +156,7 @@ public class FlooringMasteryController {
 
                 boolean informationIsConfirmed = view.confirmAction(orderToEdit, Action.EDIT);
                 if (informationIsConfirmed) {
-                    service.storeEditedOrder();
+                    service.storeEditedOrder(orderToEdit, date);
                     view.displayEditOrderSuccessBanner();
                 } else {
                     view.displayCancelEditBanner();
@@ -167,7 +168,7 @@ public class FlooringMasteryController {
     private void removeOrder() throws FlooringMasteryPersistenceException, NoOrdersOnDateException, InterruptedException {
         view.displayRemoveOrderBanner();
         LocalDate dateChoice = view.retrieveOrderDate();
-        service.setOrdersFile(dateChoice, Action.REMOVE);
+        service.setOrdersFile(dateChoice, Action.REMOVE); // will throw exception if Orders file does not exist for specified date
 
         List<Order> ordersList = service.retrieveOrdersList();
         if (ordersList.size() == 0) {
@@ -181,7 +182,7 @@ public class FlooringMasteryController {
             boolean deletionIsConfirmed = view.confirmAction(orderToRemove, Action.REMOVE);
 
             if (deletionIsConfirmed) {
-                service.removeOrder(orderToRemove);
+                service.removeOrder(orderToRemove, dateChoice);
                 // If ordersList size is 0 after order removal, we've removed all orders for that date and can delete the
                 // loaded Orders file.
                 if (ordersList.size() == 0) {

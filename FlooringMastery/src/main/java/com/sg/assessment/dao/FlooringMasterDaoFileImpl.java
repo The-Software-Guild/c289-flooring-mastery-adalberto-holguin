@@ -87,7 +87,7 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         try {
             newOrdersFile.createNewFile();
         } catch (IOException e) {
-            throw new FlooringMasteryPersistenceException("Error accessing orders file.");
+            throw new FlooringMasteryPersistenceException("Error creating new orders file.");
         }
     }
 

@@ -1,5 +1,6 @@
 package com.sg.assessment.service;
 
+import com.sg.assessment.service.exceptions.InvalidDateException;
 import com.sg.assessment.dao.exceptions.FlooringMasteryPersistenceException;
 import com.sg.assessment.dao.exceptions.NoOrdersOnDateException;
 import com.sg.assessment.dto.Action;
@@ -34,6 +35,13 @@ public interface FlooringMasteryService {
     void setOrdersFile(LocalDate date, Action action) throws FlooringMasteryPersistenceException, NoOrdersOnDateException;
 
     /**
+     * Validates that the user's chosen date is a date in the future when adding orders.
+     *
+     * @param date the date specified by the user
+     */
+    void verifyDate(LocalDate date) throws InvalidDateException;
+
+    /**
      * Populates the statesList and productsList with the data in the Taxes and Products files respectively.
      *
      * @throws FlooringMasteryPersistenceException if the DAO has problems reading the Taxes or Products files
@@ -62,27 +70,31 @@ public interface FlooringMasteryService {
     List<Product> retrieveProductsList();
 
     /**
-     * Calls the DAO method that enters the new order data into the current Orders file.
+     * Writes new order to the corresponding Orders file and writes an audit entry of the operation.
      *
      * @param newOrder the new order to be added to the Orders file
-     * @throws FlooringMasteryPersistenceException if the DAO has problems writing to the current Orders file
+     * @param date the date the order is being placed
+     * @throws FlooringMasteryPersistenceException if the DAO or auditDAO have problems writing to the Orders or Audit files.
      */
-    void enterOrder(Order newOrder) throws FlooringMasteryPersistenceException;
+    void enterOrder(Order newOrder, LocalDate date) throws FlooringMasteryPersistenceException;
 
     /**
-     * Calls the DAO method that will write the current Orders file with the information of an order the user edited.
+     * Writes edited order to the corresponding Orders file and writes an audit entry of the operation.
      *
+     * @param order the edited order
+     * @param date the date of the edited order
      * @throws FlooringMasteryPersistenceException if the DAO has problems writing to the current Orders file
      */
-    void storeEditedOrder() throws FlooringMasteryPersistenceException;
+    void storeEditedOrder(Order order, LocalDate date) throws FlooringMasteryPersistenceException;
 
     /**
-     * Calls the DAO method that removes an order from the current Orders file.
+     * Removes an order from the current Orders file and writes an audit entry of the operation.
      *
      * @param order the order to be removed
+     * @param date the date of the removed order
      * @throws FlooringMasteryPersistenceException if the DAO has problems writing to the current Orders file
      */
-    void removeOrder(Order order) throws FlooringMasteryPersistenceException;
+    void removeOrder(Order order, LocalDate date) throws FlooringMasteryPersistenceException;
 
     /**
      * Calls the DAO method that deletes the current Orders file if there are no orders in it.
