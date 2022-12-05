@@ -55,10 +55,10 @@ public class FlooringMasteryView {
         int orderNumber = 0;
         switch (action) {
             case EDIT:
-                orderNumber = io.readInt("\nEnter the number of the order you wish to edit:", 1, ordersList.size());
+                orderNumber = io.readInt("\nEnter the number of the order you wish to edit:");
                 break;
             case REMOVE:
-                orderNumber = io.readInt("\nEnter the number of the order you wish to remove:", 1, ordersList.size());
+                orderNumber = io.readInt("\nEnter the number of the order you wish to remove:");
                 break;
         }
         // Look for the order with that number, if none match, return null
@@ -91,8 +91,9 @@ public class FlooringMasteryView {
 
     public void displayOrders(List<Order> orderList) {
         for (Order order : orderList) {
-            io.print("Order " + order.getOrderNumber() + ": " + order.getCustomerName());
+            io.print("Order Number: " + order.getOrderNumber());
             displayDivider();
+            io.print("Customer Name: " + order.getCustomerName());
             io.print("State: " + order.getState());
             io.print("Product Type: " + order.getProductType());
             io.print("Area: " + order.getArea() + " sq. ft.");
@@ -103,7 +104,7 @@ public class FlooringMasteryView {
         }
     }
 
-    public boolean confirmOrderInformation(Order order) {
+    public boolean confirmAction(Order order, Action action) {
         io.print("\nOrder Review");
         io.print("\nOrder Number: " + order.getOrderNumber());
         io.print("Customer Name: " + order.getCustomerName());
@@ -115,7 +116,18 @@ public class FlooringMasteryView {
         io.print("Tax: $" + order.getTax());
         io.print("Total: $" + order.getTotal());
 
-        int userChoice = io.readInt("\nConfirm order information     1) YES     2) NO", 1, 2);
+        int userChoice = 0;
+        switch (action) {
+            case ADD:
+                userChoice = io.readInt("\nConfirm order placement     1) YES     2) NO", 1, 2);
+                break;
+            case EDIT:
+                userChoice = io.readInt("\nConfirm new order information:     1) YES     2) NO", 1, 2);
+                break;
+            case REMOVE:
+                userChoice = io.readInt("\nConfirm order deletion:     1) YES     2) NO", 1, 2);
+                break;
+        }
         if (userChoice == 1) {
             return true;
         } else {
@@ -174,6 +186,11 @@ public class FlooringMasteryView {
         Thread.sleep(1500);
     }
 
+    public void displayRemoveOrderSuccessBanner() throws InterruptedException {
+        io.print("\nOrder removed successfully.");
+        Thread.sleep(1500);
+    }
+
     public void displayOrderCanceledBanner() throws InterruptedException {
         io.print("\nOrder has been cancelled.");
         Thread.sleep(1500);
@@ -195,6 +212,11 @@ public class FlooringMasteryView {
 
     public void displayRemoveOrderBanner() {
         io.print("\n================ REMOVE ORDER ================");
+    }
+
+    public void displayCancelRemoveBanner() throws InterruptedException {
+        io.print("\nOrder removal cancelled.");
+        Thread.sleep(1500);
     }
 
     public void displayChosenOrder(Order o) {

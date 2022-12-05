@@ -139,8 +139,11 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
     }
 
     @Override
-    public Order removeOrder(Order removedOrder) throws UnsupportedOperationException {
-        removedOrder = removeOrder(removedOrder);
+    public void removeOrder(Order orderToRemove) throws FlooringMasteryPersistenceException {
+        dao.removeOrder(orderToRemove);
+
+
+//        removedOrder = removeOrder(removedOrder);
 //        if (removedOrder != null) {
 //            dao.checkFileExist("Order #"
 //                    + removedOrder.getOrderNumber() + " for date"
@@ -149,7 +152,7 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
 //        } else {
 //            throw new UnsupportedOperationException("ERROR: No orders with that number exists on that date");
 //        }
-        return removedOrder;
+//        return removedOrder;
     }
 
     @Override

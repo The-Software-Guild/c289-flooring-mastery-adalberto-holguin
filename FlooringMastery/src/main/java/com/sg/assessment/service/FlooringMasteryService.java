@@ -51,8 +51,7 @@ public interface FlooringMasteryService {
     Order retrieveOrder(LocalDate dateChoice, int orderNumber)
         throws UnsupportedOperationException;
 
-    Order removeOrder(Order removedOrder)
-            throws UnsupportedOperationException;
+    void removeOrder(Order order) throws FlooringMasteryPersistenceException;
 
 }
 

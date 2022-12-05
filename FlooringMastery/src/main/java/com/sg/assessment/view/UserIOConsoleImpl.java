@@ -107,8 +107,14 @@ public class UserIOConsoleImpl implements UserIO {
     @Override
     public int readInt(String prompt) {
         Scanner inputReader = new Scanner(System.in);
-        System.out.println(prompt);
-        return Integer.parseInt(inputReader.nextLine());
+        while (true) {
+            try {
+                System.out.println(prompt);
+                return Integer.parseInt(inputReader.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Error. Please input only whole numbers for your selection.");
+            }
+        }
     }
 
     @Override

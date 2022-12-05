@@ -106,23 +106,9 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
     }
 
     @Override
-    public Order removeOrder(Order chosenOrder) {
-
-        int orderNumber = chosenOrder.getOrderNumber();
-
-        List<Order> orders = getOrdersList();
-        Order removedOrder = orders.stream()
-                .filter(o -> o.getOrderNumber() == orderNumber)
-                .findFirst().orElse(null);
-
-        if (removedOrder != null) {
-            orders.remove(removedOrder);
-            //writeOrdersFile();
-            return removedOrder;
-        } else {
-            return null;
-        }
-
+    public void removeOrder(Order order) throws FlooringMasteryPersistenceException {
+        ordersList.remove(order);
+        writeOrdersFile(ordersList);
     }
 
     @Override
