@@ -39,7 +39,7 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
         BigDecimal laborCost = order.getArea().multiply(order.getLaborCostPerSquareFoot()).setScale(2, RoundingMode.HALF_EVEN);
 
         // Getting State from statesList that matches state abbreviation in the Order, so we can calculate tax.
-        BigDecimal tax = null;
+        BigDecimal tax=new BigDecimal("0");
         for (State state : dao.getStatesList()) {
             if (state.getStateAbbreviation().equals(order.getState())) {
                 BigDecimal stateTax = state.getTaxRate().divide(new BigDecimal("100"), 15, RoundingMode.HALF_EVEN);
@@ -52,6 +52,7 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
         // Calculations for total.
         BigDecimal materialsPlusLabor = materialCost.add(laborCost);
         BigDecimal total = materialsPlusLabor.add(tax);
+
 
         order.setMaterialCost(materialCost);
         order.setLaborCost(laborCost);
