@@ -19,6 +19,24 @@ public class Order {
     private BigDecimal tax;
     private BigDecimal total;
 
+    @Override
+    public String toString() {
+        return "Order{" +
+                "orderNumber=" + orderNumber +
+                ", customerName='" + customerName + '\'' +
+                ", state='" + state + '\'' +
+                ", taxRate=" + taxRate +
+                ", productType='" + productType + '\'' +
+                ", area=" + area +
+                ", costPerSquareFoot=" + costPerSquareFoot +
+                ", laborCostPerSquareFoot=" + laborCostPerSquareFoot +
+                ", materialCost=" + materialCost +
+                ", laborCost=" + laborCost +
+                ", tax=" + tax +
+                ", total=" + total +
+                '}';
+    }
+
     public Order() {
     }
 
@@ -133,24 +151,6 @@ public class Order {
 
     public void setTotal(BigDecimal total) {
         this.total = total;
-    }
-
-    @Override
-    public String toString() {
-        return "Order{" +
-                "orderNumber=" + orderNumber +
-                ", customerName='" + customerName + '\'' +
-                ", state='" + state + '\'' +
-                ", taxRate=" + taxRate +
-                ", productType='" + productType + '\'' +
-                ", area=" + area +
-                ", costPerSquareFoot=" + costPerSquareFoot +
-                ", laborCostPerSquareFoot=" + laborCostPerSquareFoot +
-                ", materialCost=" + materialCost +
-                ", laborCost=" + laborCost +
-                ", tax=" + tax +
-                ", total=" + total +
-                '}';
     }
 
     @Override
