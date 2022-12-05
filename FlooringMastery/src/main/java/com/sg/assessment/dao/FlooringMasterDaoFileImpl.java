@@ -7,6 +7,8 @@ import com.sg.assessment.dto.Order;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import com.sg.assessment.dto.Product;
@@ -18,6 +20,7 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
 
     private final File STATE_FILE;
     private final File PRODUCT_FILE;
+    private final File EXPORT_FILE;
     private final String DELIMITER = ",";
     private File currentOrdersFile; // not final, as this file changes
     private List<Order> ordersList = new ArrayList<>();
@@ -27,6 +30,7 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
     public FlooringMasterDaoFileImpl() {
         STATE_FILE = new File(".\\data\\Taxes.txt");
         PRODUCT_FILE = new File(".\\data\\Products.txt");
+        EXPORT_FILE = new File(".\\backup\\DataExport.txt");
     }
 
     @Override
@@ -77,9 +81,11 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
             if (!currentOrdersFile.exists()) {
                 createNewOrdersFile(currentOrdersFile);
             }
-        } else if (!currentOrdersFile.exists()) {
+        }
+        else if (!currentOrdersFile.exists()) {
             throw new NoOrdersOnDateException("There are no orders for the specified date.");
         }
+
         loadOrdersFile();
     }
 
@@ -164,6 +170,38 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         return productsList;
     }
 
+    private String getDateAsString(File orderFile) {
+        String [] fileTokens = orderFile.getName().split("_|\\.");
+        String unformattedDate = fileTokens[1];
+        LocalDate ld = LocalDate.parse(unformattedDate, DateTimeFormatter.ofPattern("MMddyyyy"));
+        return ld.format(DateTimeFormatter.ofPattern("MM-dd-yyyy"));
+    }
+    public void writeToExportFile() throws FlooringMasteryPersistenceException, NoOrdersOnDateException{
+
+        try (PrintWriter out = new PrintWriter(new FileWriter(EXPORT_FILE))) {
+            String exportFileHeader = "OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot," +
+                    "LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total,Date";
+            out.println(exportFileHeader);
+
+            //collects files from the orders folder
+            File folder = new File(".\\orders\\");
+            File[] orderFiles = folder.listFiles();
+
+            //for each file under orders folder
+            for (File file : orderFiles) {
+                setCurrentOrdersFile(".\\orders\\" + file.getName(), Action.DISPLAY);
+                //write each order to EXPORT_FILE
+                for (Order order: ordersList) {
+                    String orderAsText = marshallOrder(order) + ", " + getDateAsString(file);
+                    out.println(orderAsText);
+                    out.flush();
+                }
+            }
+
+        } catch (IOException e) {
+            throw new FlooringMasteryPersistenceException("Error. Could not write data to file.");
+        }
+    }
     private String marshallOrder(Order order) {
         String orderAsText = order.getOrderNumber() + DELIMITER;
         orderAsText += order.getCustomerName() + DELIMITER;

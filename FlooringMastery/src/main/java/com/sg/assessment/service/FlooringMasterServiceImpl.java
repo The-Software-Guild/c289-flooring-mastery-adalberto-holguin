@@ -100,6 +100,10 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
         dao.removeOrder(orderToRemove);
     }
 
+    public void exportData() throws FlooringMasteryPersistenceException, NoOrdersOnDateException{
+        dao.writeToExportFile();
+    }
+
     @Override
     public void deleteEmptyFile() {
         dao.deleteFile();

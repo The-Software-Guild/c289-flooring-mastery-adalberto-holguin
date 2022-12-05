@@ -58,7 +58,7 @@ public class FlooringMasteryController {
                         removeOrder();
                         break;
                     case 5:
-                        //exportData();
+                        exportData();
                         break;
                     case 6:
                         isInitialized = false;
@@ -78,7 +78,9 @@ public class FlooringMasteryController {
         service.loadStatesAndProducts();
     }
 
-    private void displayOrders() throws FlooringMasteryPersistenceException, NoOrdersOnDateException {
+    private void displayOrders() throws
+            FlooringMasteryPersistenceException,
+            NoOrdersOnDateException, InterruptedException {
         LocalDate orderDate = view.retrieveOrderDate();
         service.setOrdersFile(orderDate, Action.DISPLAY);
         List<Order> ordersList = service.retrieveOrdersList();
@@ -192,6 +194,11 @@ public class FlooringMasteryController {
                 view.displayCancelRemoveBanner();
             }
         }
+    }
+
+    private void exportData() throws FlooringMasteryPersistenceException, NoOrdersOnDateException {
+        service.exportData();
+        view.displayExportDataSuccessBanner();
     }
 }
 
