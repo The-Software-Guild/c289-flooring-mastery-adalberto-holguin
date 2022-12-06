@@ -7,13 +7,13 @@ import com.sg.assessment.dto.Action;
 import com.sg.assessment.dto.Order;
 import com.sg.assessment.dto.Product;
 import com.sg.assessment.dto.State;
+import com.sg.assessment.service.exceptions.InvalidStateException;
 import com.sg.assessment.service.exceptions.NoSuchOrderException;
-import org.springframework.stereotype.Component;
+import com.sg.assessment.service.exceptions.NoSuchProductException;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Component
 public interface FlooringMasteryService {
 
     /**
@@ -41,6 +41,35 @@ public interface FlooringMasteryService {
      * @param date the date specified by the user
      */
     void validateDate(LocalDate date) throws InvalidDateException;
+
+    /**
+     * Generates an order number for the new order the user is adding.
+     *
+     * @return the order number
+     */
+    int generateOrderNumber();
+
+    /**
+     * Validates that the State chosen by the user is an available state. Even though we get the State from the user by
+     * presenting a List of available states in the view, and the user can only choose from those, we still implement this
+     * method that validates the state input to show that we must always protect our business logic from future changes, i.e.:
+     * a change in the implementation of the view.
+     *
+     * @param stateAbbreviation the abbreviation of the state selected by the user
+     * @throws InvalidStateException if the state entered by the user is not on the list of available states
+     */
+    void validateState(String stateAbbreviation) throws InvalidStateException;
+
+    /**
+     * Validates that the Product chosen by the user is an available product. Even though we get the Product from the user by
+     * presenting a List of available products in the view, and the user can only choose from those, we still implement this
+     * method that validates the state input to show that we must always protect our business logic from future changes, i.e.:
+     * a change in the implementation of the view.
+     *
+     * @param productType the product type selected by the user
+     * @throws NoSuchProductException if the product entered by the user is not on the list of available products
+     */
+    void validateProduct(String productType) throws NoSuchProductException;
 
     /**
      * Populates the statesList and productsList with the data in the Taxes and Products files respectively.
@@ -116,7 +145,15 @@ public interface FlooringMasteryService {
      */
     void deleteEmptyFile();
 
-    //test
+    /**
+     * Calls the DAO method that exports the orders from all Orders files to the DataExport file.
+     *
+     * @throws FlooringMasteryPersistenceException if the DAO has problems accessing an Orders file
+     * @throws NoOrdersOnDateException             if the date the user is specifying does not have a corresponding Orders file
+     *                                             (this should not ever happen in this method the way the program is
+     *                                             structured, and is only needed because this method uses the
+     *                                             setCurrentOrdersFile method, which can throw this exception)
+     */
     void exportData() throws FlooringMasteryPersistenceException, NoOrdersOnDateException;
 }
 
