@@ -41,6 +41,8 @@ public interface FlooringMasteryDao {
      */
     void removeOrder(Order order) throws FlooringMasteryPersistenceException;
 
+    void loadOrdersFile() throws FlooringMasteryPersistenceException;
+
     /**
      * Deleted the currently loaded Orders file.
      * We only run this in cases where the file is empty, like when the user began adding the first order for a specific date,

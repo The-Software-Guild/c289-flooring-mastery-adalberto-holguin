@@ -93,7 +93,7 @@ public class FlooringMasteryController {
         LocalDate orderDate = view.retrieveOrderDate();
 
         // Order date must be in the future when adding new orders, will throw Exception if it is not.
-        service.verifyDate(orderDate);
+        service.validateDate(orderDate);
 
         // Assigning order to correct file, creates an Orders file for the specified date if one does not exist.
         service.setOrdersFile(orderDate, Action.ADD);
@@ -101,6 +101,7 @@ public class FlooringMasteryController {
         List<Order> ordersList = service.retrieveOrdersList(Action.ADD);
         List<State> statesList = service.retrieveStatesList();
         List<Product> productsList = service.retrieveProductsList();
+
         Order newOrder = new Order();
         newOrder = view.retrieveOrderInformation(ordersList, statesList, productsList, Action.ADD, newOrder);
 

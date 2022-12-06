@@ -98,7 +98,6 @@ public class FlooringMasteryView {
                     order.setOrderNumber(maxOrderNumber + 1);
                 }
 
-
                 // Getting customer name.
                 String customerName = io.readNames("Enter customer name");
 

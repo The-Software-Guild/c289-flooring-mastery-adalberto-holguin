@@ -105,7 +105,8 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         }
     }
 
-    private void loadOrdersFile() throws FlooringMasteryPersistenceException {
+    @Override
+    public void loadOrdersFile() throws FlooringMasteryPersistenceException {
         // Clearing list, so it can be populated with current information as we changed Orders file or edited its contents.
         ordersList.clear();
 
@@ -184,8 +185,8 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         LocalDate ld = LocalDate.parse(unformattedDate, DateTimeFormatter.ofPattern("MMddyyyy"));
         return ld.format(DateTimeFormatter.ofPattern("MM-dd-yyyy"));
     }
-    public void writeToExportFile() throws FlooringMasteryPersistenceException, NoOrdersOnDateException{
 
+    public void writeToExportFile() throws FlooringMasteryPersistenceException, NoOrdersOnDateException{
         try (PrintWriter out = new PrintWriter(new FileWriter(EXPORT_FILE))) {
             String exportFileHeader = "OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot," +
                     "LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total,Date";
@@ -205,11 +206,11 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
                     out.flush();
                 }
             }
-
         } catch (IOException e) {
             throw new FlooringMasteryPersistenceException("Error. Could not write data to file.");
         }
     }
+
     private String marshallOrder(Order order) {
         String orderAsText = order.getOrderNumber() + DELIMITER;
         orderAsText += order.getCustomerName() + DELIMITER;

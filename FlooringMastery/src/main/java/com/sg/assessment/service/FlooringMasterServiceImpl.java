@@ -72,7 +72,7 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
     }
 
     @Override
-    public void verifyDate(LocalDate orderDate) throws InvalidDateException {
+    public void validateDate(LocalDate orderDate) throws InvalidDateException {
         if (orderDate.isBefore(LocalDate.now())) {
             throw new InvalidDateException("Error, invalid date. New orders cannot be added to past dates.");
         }
