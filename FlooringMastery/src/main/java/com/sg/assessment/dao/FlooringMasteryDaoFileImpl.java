@@ -16,7 +16,7 @@ import com.sg.assessment.dto.State;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
+public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
 
     private final File STATE_FILE;
     private final File PRODUCT_FILE;
@@ -27,14 +27,14 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
     private List<State> statesList = new ArrayList<>();
     private List<Product> productsList = new ArrayList<>();
 
-    public FlooringMasterDaoFileImpl() {
+    public FlooringMasteryDaoFileImpl() {
         STATE_FILE = new File(".\\data\\Taxes.txt");
         PRODUCT_FILE = new File(".\\data\\Products.txt");
         EXPORT_FILE = new File(".\\backup\\DataExport.txt");
     }
 
     // This Constructor used for testing.
-    public FlooringMasterDaoFileImpl(File testFile) {
+    public FlooringMasteryDaoFileImpl(File testFile) {
         currentOrdersFile = testFile;
         STATE_FILE = new File(".\\data\\Taxes.txt");
         PRODUCT_FILE = new File(".\\data\\Products.txt");

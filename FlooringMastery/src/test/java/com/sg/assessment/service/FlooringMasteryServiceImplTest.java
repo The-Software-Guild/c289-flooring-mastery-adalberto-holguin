@@ -1,34 +1,38 @@
-package com.sg.assessment.servicetest;
+package com.sg.assessment.service;
 
-import com.sg.assessment.dao.FlooringMasterDaoFileImpl;
-import com.sg.assessment.dao.FlooringMasteryAuditDAO;
-import com.sg.assessment.dao.FlooringMasteryAuditDAOFileImpl;
+import com.sg.assessment.dao.FlooringMasteryDaoFileImpl;
+import com.sg.assessment.dao.FlooringMasteryAuditDao;
+import com.sg.assessment.dao.FlooringMasteryAuditDaoFileImpl;
 import com.sg.assessment.dao.FlooringMasteryDao;
 import com.sg.assessment.dto.Order;
-import com.sg.assessment.service.FlooringMasterServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FlooringMasterServiceImplTest {
-    FlooringMasteryDao dao = new FlooringMasterDaoFileImpl();
+public class FlooringMasteryServiceImplTest {
 
-    FlooringMasteryAuditDAO auditDao = new FlooringMasteryAuditDAOFileImpl();
-    //FlooringMasterServiceImpl service = new FlooringMasterServiceImpl(dao, auditDao);
+    FlooringMasteryService service;
+
+    public FlooringMasteryServiceImplTest() {
+        ApplicationContext appContext = new ClassPathXmlApplicationContext("applicationContext.xml");
+        service = appContext.getBean("flooringMasteryService", FlooringMasteryService.class);
+    }
 
     Order order = new Order();
     @BeforeEach
-    public void init(){
+    void setup(){
 
         order.setOrderNumber(1);
-        order.setCustomerName("sam");
+        order.setCustomerName("Sam");
         order.setState("Texas");
         order.setTaxRate(new BigDecimal("4.45"));
-        order.setProductType("carpet");
+        order.setProductType("Carpet");
         order.setArea(new BigDecimal("2000"));
         order.setCostPerSquareFoot(new BigDecimal("2.25"));
         order.setLaborCostPerSquareFoot(new BigDecimal("2.10"));
@@ -50,8 +54,4 @@ public class FlooringMasterServiceImplTest {
         System.out.println(order.toString());
         //assertEquals(order,service.calculatePrices(order));
     }
-
-
-
-
 }

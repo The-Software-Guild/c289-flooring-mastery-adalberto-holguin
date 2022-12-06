@@ -1,7 +1,7 @@
 package com.sg.assessment.service;
 
 import com.sg.assessment.service.exceptions.InvalidDateException;
-import com.sg.assessment.dao.FlooringMasteryAuditDAO;
+import com.sg.assessment.dao.FlooringMasteryAuditDao;
 import com.sg.assessment.dao.FlooringMasteryDao;
 import com.sg.assessment.dao.exceptions.FlooringMasteryPersistenceException;
 import com.sg.assessment.dao.exceptions.NoOrdersOnDateException;
@@ -24,12 +24,17 @@ import java.util.List;
 
 
 @Component
-public class FlooringMasterServiceImpl implements FlooringMasteryService {
+public class FlooringMasteryServiceImpl implements FlooringMasteryService {
 
     @Autowired
     FlooringMasteryDao dao;
     @Autowired
-    FlooringMasteryAuditDAO auditDao;
+    FlooringMasteryAuditDao auditDao;
+
+    public FlooringMasteryServiceImpl(FlooringMasteryDao dao, FlooringMasteryAuditDao auditDao) {
+        this.dao = dao;
+        this.auditDao = auditDao;
+    }
 
     @Override
     public Order calculatePrices(Order order) {

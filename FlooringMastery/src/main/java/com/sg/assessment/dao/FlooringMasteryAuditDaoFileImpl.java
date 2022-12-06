@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 @Component
-public class FlooringMasteryAuditDAOFileImpl implements FlooringMasteryAuditDAO {
+public class FlooringMasteryAuditDaoFileImpl implements FlooringMasteryAuditDao {
 
     @Override
     public void writeAuditEntry(String message, String fileName) throws FlooringMasteryPersistenceException {
