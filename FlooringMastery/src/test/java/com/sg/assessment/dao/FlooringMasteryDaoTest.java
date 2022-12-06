@@ -6,6 +6,8 @@ import com.sg.assessment.dto.Product;
 import com.sg.assessment.dto.State;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -20,14 +22,19 @@ class FlooringMasteryDaoTest {
     // The methods addOrder and removeOrder are tested directly here. All other methods of the DAO are tested indirectly when
     // testing those two methods, except for setCurrentFile, deleteFile, and writeToExport.
 
-    FlooringMasteryDao testDao;
+    FlooringMasteryDao dao;
     private List<State> stateList = new ArrayList<>();
     private List<Product> productList = new ArrayList<>();
+
+    public FlooringMasteryDaoTest() {
+        ApplicationContext appContext = new ClassPathXmlApplicationContext("applicationContext.xml");
+        dao = appContext.getBean("flooringMasteryDao", FlooringMasteryDao.class);
+    }
 
     @BeforeEach
     void setUp() {
         File testFile = new File("src/test/testorders.txt");
-        testDao = new FlooringMasterDaoFileImpl(testFile);
+        dao = new FlooringMasteryDaoFileImpl(testFile);
 
         stateList.add(new State("TX", "Texas", new BigDecimal("4.45")));
         stateList.add(new State("WA", "Washington", new BigDecimal("9.25")));
@@ -69,11 +76,14 @@ class FlooringMasteryDaoTest {
         BigDecimal materialsPlusLabor = order.getMaterialCost().add(order.getLaborCost());
         order.setTotal(materialsPlusLabor.add(order.getTax()));
 
+        // To test that adding orders to file works, (make sure testorders file is empty first) we will try adding an order to
+        // it as well as to the expectedList, then we will load the orders file and return its contents, which should be equal
+        // to the expectedList which contains the order added to the file.
         List<Order> expectedList = new ArrayList<>();
         expectedList.add(order);
-        testDao.addOrder(order);
-        testDao.loadOrdersFile();
-        assertEquals(expectedList, testDao.getOrdersList(), "Returned list does not match expected list.");
+        dao.addOrder(order);
+        dao.loadOrdersFile();
+        assertEquals(expectedList, dao.getOrdersList(), "Returned list does not match expected list.");
     }
 
     @Test
@@ -101,6 +111,8 @@ class FlooringMasteryDaoTest {
                 break;
             }
         }
+        BigDecimal materialsPlusLabor = order.getMaterialCost().add(order.getLaborCost());
+        order.setTotal(materialsPlusLabor.add(order.getTax()));
 
         Order order2 = new Order();
         order2.setOrderNumber(4);
@@ -119,17 +131,23 @@ class FlooringMasteryDaoTest {
             if (state.getStateAbbreviation().equals(order.getState())) {
                 BigDecimal stateTax = state.getTaxRate().divide(new BigDecimal("100"), 15, RoundingMode.HALF_EVEN);
                 BigDecimal costPlusLabor = order.getMaterialCost().add(order.getLaborCost());
-                order.setTax(costPlusLabor.multiply(stateTax).setScale(2, RoundingMode.HALF_EVEN));
+                order2.setTax(costPlusLabor.multiply(stateTax).setScale(2, RoundingMode.HALF_EVEN));
                 break;
             }
         }
-        // Testing that the Orders file is updated properly.
-        testDao.addOrder(order);
-        testDao.addOrder(order2);
-        List<Order> expectedList = new ArrayList<>();
-        expectedList.add(order2); // adding order 2 to array list
+        materialsPlusLabor = order2.getMaterialCost().add(order.getLaborCost());
+        order2.setTotal(materialsPlusLabor.add(order.getTax()));
 
-        testDao.removeOrder(order); // removing order 1 from file
-        assertEquals(expectedList, testDao.getOrdersList(), "Returned list does not match expected list.");
+        // Adding two orders to the testorders file, and adding the second one to expectedList. To test that removeOrder works,
+        // we will try removing the first order from the file, then loading the file again, which should now only contain the
+        // order that is in expectedList if it removed the first order from the file correctly.
+        dao.addOrder(order);
+        dao.addOrder(order2);
+        List<Order> expectedList = new ArrayList<>();
+        expectedList.add(order2);
+
+        dao.removeOrder(order);
+        dao.loadOrdersFile();
+        assertEquals(expectedList, dao.getOrdersList(), "Returned list does not match expected list.");
     }
 }
