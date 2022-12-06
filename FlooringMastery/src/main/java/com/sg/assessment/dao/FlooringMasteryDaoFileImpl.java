@@ -89,8 +89,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
             if (!currentOrdersFile.exists()) {
                 createNewOrdersFile(currentOrdersFile);
             }
-        }
-        else if (!currentOrdersFile.exists()) {
+        } else if (!currentOrdersFile.exists()) {
             throw new NoOrdersOnDateException("There are no orders for the specified date.");
         }
 
@@ -149,11 +148,11 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
                     "LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total";
             out.println(ordersFileHeader);
 
-            for (Order order : orderList) {
+            orderList.forEach(order -> {
                 String orderAsText = marshallOrder(order);
                 out.println(orderAsText);
                 out.flush();
-            }
+            });
         } catch (IOException e) {
             throw new FlooringMasteryPersistenceException("Error. Could not write order data to file.");
         }
@@ -180,7 +179,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
     }
 
     private String getDateAsString(File orderFile) {
-        String [] fileTokens = orderFile.getName().split("_|\\.");
+        String[] fileTokens = orderFile.getName().split("_|\\.");
         String unformattedDate = fileTokens[1];
         LocalDate ld = LocalDate.parse(unformattedDate, DateTimeFormatter.ofPattern("MMddyyyy"));
         return ld.format(DateTimeFormatter.ofPattern("MM-dd-yyyy"));
@@ -199,12 +198,13 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao {
             //for each file under orders folder
             for (File file : orderFiles) {
                 setCurrentOrdersFile(".\\orders\\" + file.getName(), Action.DISPLAY);
+
                 //write each order to EXPORT_FILE
-                for (Order order: ordersList) {
+                ordersList.forEach(order -> {
                     String orderAsText = marshallOrder(order) + ", " + getDateAsString(file);
                     out.println(orderAsText);
                     out.flush();
-                }
+                });
             }
         } catch (IOException e) {
             throw new FlooringMasteryPersistenceException("Error. Could not write data to file.");
