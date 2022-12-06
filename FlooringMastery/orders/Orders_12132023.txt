@@ -1,0 +1,2 @@
+OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot,LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total
+1,Adalberto Holguin,KY,6.00,Laminate,198.00,1.75,2.10,346.50,415.80,45.74,808.04

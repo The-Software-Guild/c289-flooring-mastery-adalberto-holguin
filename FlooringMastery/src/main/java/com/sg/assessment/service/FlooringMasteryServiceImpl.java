@@ -52,11 +52,9 @@ public class FlooringMasteryServiceImpl implements FlooringMasteryService {
                 break;
             }
         }
-
         // Calculations for total.
         BigDecimal materialsPlusLabor = materialCost.add(laborCost);
         BigDecimal total = materialsPlusLabor.add(tax);
-
 
         order.setMaterialCost(materialCost);
         order.setLaborCost(laborCost);
