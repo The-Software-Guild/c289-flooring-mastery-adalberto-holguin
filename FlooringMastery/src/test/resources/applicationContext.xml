@@ -7,8 +7,8 @@
     <!-- Bean definitions go here -->
     <bean id="flooringMasteryDao" class="com.sg.assessment.dao.FlooringMasteryDaoFileImpl"/>
 
-    <bean id="flooringMasteryDaoStub" class="com.sg.assessment.service.FlooringMasteryDaoStubImpl"/>
-    <bean id="flooringMasteryAuditDaoStub" class="com.sg.assessment.service.FlooringMasteryAuditDaoStubImpl"/>
+    <bean id="flooringMasteryDaoStub" class="com.sg.assessment.dao.FlooringMasteryDaoStubImpl"/>
+    <bean id="flooringMasteryAuditDaoStub" class="com.sg.assessment.dao.FlooringMasteryAuditDaoStubImpl"/>
     <bean id="flooringMasteryService" class="com.sg.assessment.service.FlooringMasteryServiceImpl">
         <constructor-arg ref="flooringMasteryDaoStub"/>
         <constructor-arg ref="flooringMasteryAuditDaoStub"/>

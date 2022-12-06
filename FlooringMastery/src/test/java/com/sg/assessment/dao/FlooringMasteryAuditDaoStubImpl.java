@@ -1,6 +1,5 @@
-package com.sg.assessment.service;
+package com.sg.assessment.dao;
 
-import com.sg.assessment.dao.FlooringMasteryAuditDao;
 import com.sg.assessment.dao.exceptions.FlooringMasteryPersistenceException;
 
 public class FlooringMasteryAuditDaoStubImpl implements FlooringMasteryAuditDao {
