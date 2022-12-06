@@ -40,7 +40,7 @@ public interface FlooringMasteryService {
      *
      * @param date the date specified by the user
      */
-    void verifyDate(LocalDate date) throws InvalidDateException;
+    void validateDate(LocalDate date) throws InvalidDateException;
 
     /**
      * Populates the statesList and productsList with the data in the Taxes and Products files respectively.
