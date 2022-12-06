@@ -186,7 +186,7 @@ public class FlooringMasterDaoFileImpl implements FlooringMasteryDao {
         return ld.format(DateTimeFormatter.ofPattern("MM-dd-yyyy"));
     }
 
-    public void writeToExportFile() throws FlooringMasteryPersistenceException, NoOrdersOnDateException{
+    public void writeToExportFile() throws FlooringMasteryPersistenceException, NoOrdersOnDateException {
         try (PrintWriter out = new PrintWriter(new FileWriter(EXPORT_FILE))) {
             String exportFileHeader = "OrderNumber,CustomerName,State,TaxRate,ProductType,Area,CostPerSquareFoot," +
                     "LaborCostPerSquareFoot,MaterialCost,LaborCost,Tax,Total,Date";

@@ -29,7 +29,7 @@ public interface FlooringMasteryDao {
     /**
      * Writes the ordersList containing the edited order to the current Orders file.
      *
-     * @throws FlooringMasteryPersistenceException
+     * @throws FlooringMasteryPersistenceException if there is a problem writing to the desired Orders file.
      */
     void editOrder() throws FlooringMasteryPersistenceException;
 
@@ -37,10 +37,15 @@ public interface FlooringMasteryDao {
      * Removes the order from the ordersList and writes the ordersList to the current Orders file.
      *
      * @param order order number to be associated with the order.
-     * @throws UnsupportedOperationException replace later
+     * @throws FlooringMasteryPersistenceException if there is a problem writing to the desired Orders file.
      */
     void removeOrder(Order order) throws FlooringMasteryPersistenceException;
 
+    /**
+     * Clears ordersList and loads orders from currently selected Orders file into ordersList.
+     *
+     * @throws FlooringMasteryPersistenceException if there is a problem reading from the desired Orders file.
+     */
     void loadOrdersFile() throws FlooringMasteryPersistenceException;
 
     /**
@@ -93,6 +98,9 @@ public interface FlooringMasteryDao {
      *
      * @throws FlooringMasteryPersistenceException if we cannot access the Orders file with the date the user is specifying
      * @throws NoOrdersOnDateException             if the date the user is specifying does not have a corresponding Orders file
+     *                                             (this should not ever happen in this method the way the program is
+     *                                             structured, and is only needed because this method uses the
+     *                                             setCurrentOrdersFile method, which can throw this exception)
      */
     void writeToExportFile() throws FlooringMasteryPersistenceException, NoOrdersOnDateException;
 }

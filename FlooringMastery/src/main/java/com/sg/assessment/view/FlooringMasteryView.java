@@ -17,12 +17,8 @@ import java.util.List;
 @Component
 public class FlooringMasteryView {
 
-    private UserIO io;
-
     @Autowired
-    public FlooringMasteryView(UserIO io) {
-        this.io = io;
-    }
+    UserIO io;
 
     public void printMainMenu() {
         io.print("\n* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *");
@@ -78,26 +74,12 @@ public class FlooringMasteryView {
         return orderNumber;
     }
 
-    public Order retrieveOrderInformation(List<Order> ordersList, List<State> statesList, List<Product> productsList,
-                                          Action action, Order order) {
+    public Order retrieveOrderInformation(List<State> statesList, List<Product> productsList, Action action, Order order) {
         int stateChoice; // will get index from statesList to select State
         int productChoice; // will get index from productsList to select Product
 
         switch (action) {
             case ADD:
-                // Setting order number.
-                if (ordersList.size() == 0) {
-                    order.setOrderNumber(1);
-                } else {
-                    int maxOrderNumber = 0;
-                    for (Order o : ordersList) {
-                        if (o.getOrderNumber() > maxOrderNumber) {
-                            maxOrderNumber = o.getOrderNumber();
-                        }
-                    }
-                    order.setOrderNumber(maxOrderNumber + 1);
-                }
-
                 // Getting customer name.
                 String customerName = io.readNames("Enter customer name");
 
@@ -279,6 +261,7 @@ public class FlooringMasteryView {
     public void displayExportDataSuccessBanner() {
         io.readString("All data was exported successfully. Please refer to DataExport.txt and hit any key to continue.");
     }
+
     public void displayAddOrderBanner() {
         io.print("\n================ ADD ORDER ================");
     }

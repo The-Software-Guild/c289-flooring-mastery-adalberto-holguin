@@ -8,7 +8,9 @@ import com.sg.assessment.dto.Order;
 import com.sg.assessment.dto.Product;
 import com.sg.assessment.dto.State;
 import com.sg.assessment.service.FlooringMasteryService;
+import com.sg.assessment.service.exceptions.InvalidStateException;
 import com.sg.assessment.service.exceptions.NoSuchOrderException;
+import com.sg.assessment.service.exceptions.NoSuchProductException;
 import com.sg.assessment.view.FlooringMasteryView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,14 +22,10 @@ import java.util.List;
 @Component
 public class FlooringMasteryController {
 
-    private FlooringMasteryService service;
-    private FlooringMasteryView view;
-
     @Autowired
-    public FlooringMasteryController(FlooringMasteryService service, FlooringMasteryView view) {
-        this.service = service;
-        this.view = view;
-    }
+    FlooringMasteryService service;
+    @Autowired
+    FlooringMasteryView view;
 
     public void run() throws InterruptedException {
         boolean isInitialized = false;
@@ -65,7 +63,8 @@ public class FlooringMasteryController {
                         isInitialized = false;
                         break;
                 }
-            } catch (NoOrdersOnDateException | InvalidDateException | NoSuchOrderException e) {
+            } catch (NoOrdersOnDateException | InvalidDateException | NoSuchOrderException | InvalidStateException |
+                     NoSuchProductException e) {
                 view.displayErrorMessage(e.getMessage());
             } catch (FlooringMasteryPersistenceException | IOException e) {
                 view.displayErrorMessage(e.getMessage());
@@ -88,22 +87,27 @@ public class FlooringMasteryController {
     }
 
     private void addOrder() throws InvalidDateException, FlooringMasteryPersistenceException, NoOrdersOnDateException,
-            IOException {
+            IOException, InvalidStateException, NoSuchProductException {
         view.displayAddOrderBanner();
         LocalDate orderDate = view.retrieveOrderDate();
 
         // Order date must be in the future when adding new orders, will throw Exception if it is not.
         service.validateDate(orderDate);
-
         // Assigning order to correct file, creates an Orders file for the specified date if one does not exist.
         service.setOrdersFile(orderDate, Action.ADD);
 
-        List<Order> ordersList = service.retrieveOrdersList(Action.ADD);
+        Order newOrder = new Order();
+        // Setting order's order number
+        newOrder.setOrderNumber(service.generateOrderNumber());
+
+        // Setting order's customer name, state, tax rate, product type, area, cost per sq. ft., and labor cost per sq. ft.
         List<State> statesList = service.retrieveStatesList();
         List<Product> productsList = service.retrieveProductsList();
+        newOrder = view.retrieveOrderInformation(statesList, productsList, Action.ADD, newOrder);
 
-        Order newOrder = new Order();
-        newOrder = view.retrieveOrderInformation(ordersList, statesList, productsList, Action.ADD, newOrder);
+        // Validates state and product type entered by user.
+        service.validateState(newOrder.getState());
+        service.validateProduct(newOrder.getProductType());
 
         // Calculates order's material cost, labor cost, tax, and total.
         service.calculatePrices(newOrder);
@@ -116,6 +120,7 @@ public class FlooringMasteryController {
         } else {
             // If ordersList size is 0 that means this was going to be the first order added to the loaded Orders file, so now
             // that the order is aborted, we must delete that file, otherwise we would leave an empty Orders file in the program.
+            List<Order> ordersList = service.retrieveOrdersList(Action.ADD);
             if (ordersList.size() == 0) {
                 service.deleteEmptyFile();
             }
@@ -123,14 +128,13 @@ public class FlooringMasteryController {
         }
     }
 
-    private void editOrder() throws NoOrdersOnDateException, FlooringMasteryPersistenceException, NoSuchOrderException {
+    private void editOrder() throws NoOrdersOnDateException, FlooringMasteryPersistenceException, NoSuchOrderException,
+            InvalidStateException, NoSuchProductException {
         view.displayEditOrderBanner();
         LocalDate date = view.retrieveOrderDate();
         service.setOrdersFile(date, Action.EDIT); // will throw exception if Orders file does not exist for specified date
 
-        List<Order> ordersList = service.retrieveOrdersList(Action.EDIT); // will throw exception if no orders for that date
-        List<State> statesList = service.retrieveStatesList();
-        List<Product> productsList = service.retrieveProductsList();
+        service.retrieveOrdersList(Action.EDIT); // will throw exception if no orders for that date
 
         int orderNumber = view.retrieveOrderNumber(Action.EDIT);
         Order orderToEdit = service.retrieveOrder(orderNumber); // will throw exception if no order is found with that number
@@ -140,7 +144,13 @@ public class FlooringMasteryController {
                 orderToEdit.getState(), orderToEdit.getTaxRate(), orderToEdit.getProductType(), orderToEdit.getArea(),
                 orderToEdit.getCostPerSquareFoot(), orderToEdit.getLaborCostPerSquareFoot(), orderToEdit.getMaterialCost(),
                 orderToEdit.getLaborCost(), orderToEdit.getTax(), orderToEdit.getTotal());
-        orderToEdit = view.retrieveOrderInformation(ordersList, statesList, productsList, Action.EDIT, orderToEdit);
+        List<State> statesList = service.retrieveStatesList();
+        List<Product> productsList = service.retrieveProductsList();
+        orderToEdit = view.retrieveOrderInformation(statesList, productsList, Action.EDIT, orderToEdit);
+
+        // Validates state and product entered by user.
+        service.validateState(orderToEdit.getState());
+        service.validateProduct(orderToEdit.getProductType());
 
         if (orderToEdit.equals(orderToCompare)) {
             view.displayNoEditDoneMessage();

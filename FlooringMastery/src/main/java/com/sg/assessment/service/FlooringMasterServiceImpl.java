@@ -9,7 +9,9 @@ import com.sg.assessment.dto.Action;
 import com.sg.assessment.dto.Order;
 import com.sg.assessment.dto.Product;
 import com.sg.assessment.dto.State;
+import com.sg.assessment.service.exceptions.InvalidStateException;
 import com.sg.assessment.service.exceptions.NoSuchOrderException;
+import com.sg.assessment.service.exceptions.NoSuchProductException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -24,14 +26,10 @@ import java.util.List;
 @Component
 public class FlooringMasterServiceImpl implements FlooringMasteryService {
 
-    private FlooringMasteryDao dao;
-    private FlooringMasteryAuditDAO auditDao;
-
     @Autowired
-    public FlooringMasterServiceImpl(FlooringMasteryDao dao, FlooringMasteryAuditDAO auditDao) {
-        this.dao = dao;
-        this.auditDao = auditDao;
-    }
+    FlooringMasteryDao dao;
+    @Autowired
+    FlooringMasteryAuditDAO auditDao;
 
     @Override
     public Order calculatePrices(Order order) {
@@ -79,6 +77,50 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
     }
 
     @Override
+    public int generateOrderNumber() {
+        // Generates an order number for the user's order depending on the highest order number of the list of orders for that
+        // date. If there are no orders for that date, assigns number 1 to the user's order.
+        List<Order> ordersList = dao.getOrdersList();
+        if (ordersList.size() == 0) {
+            return 1;
+        } else {
+            int maxOrderNumber = 0;
+            for (Order order : ordersList) {
+                if (order.getOrderNumber() > maxOrderNumber) {
+                    maxOrderNumber = order.getOrderNumber();
+                }
+            }
+            return maxOrderNumber + 1;
+        }
+    }
+
+    @Override
+    public void validateState(String stateAbbrv) throws InvalidStateException {
+        boolean stateIsAvailable = false;
+        for (State state : dao.getStatesList()) {
+            if (state.getStateAbbreviation().equals(stateAbbrv)) {
+                stateIsAvailable = true;
+            }
+        }
+        if (!stateIsAvailable) {
+            throw new InvalidStateException("The chosen state is not on our list of available states.");
+        }
+    }
+
+    @Override
+    public void validateProduct(String productType) throws NoSuchProductException {
+        boolean productIsAvailable = false;
+        for (Product product : dao.getProductsList()) {
+            if (product.getProductType().equals(productType)) {
+                productIsAvailable = true;
+            }
+        }
+        if (!productIsAvailable) {
+            throw new NoSuchProductException("No product called " + productType + " found in our list of available products.");
+        }
+    }
+
+    @Override
     public void loadStatesAndProducts() throws FlooringMasteryPersistenceException {
         dao.loadStatesAndProductsLists();
     }
@@ -119,8 +161,7 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
         // Writing audit entry.
         String dateAsString = date.format(DateTimeFormatter.ofPattern("MMddyyyy"));
         String fileName = ".\\audits\\Audit_" + dateAsString + ".txt";
-        auditDao.writeAuditEntry(LocalDateTime.now() + " -- placed order number " + order.getOrderNumber() + " for "
-                + date.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")), fileName);
+        auditDao.writeAuditEntry(LocalDateTime.now() + " -- placed order number " + order.getOrderNumber(), fileName);
     }
 
     @Override
@@ -130,8 +171,7 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
         // Writing audit entry.
         String dateAsString = date.format(DateTimeFormatter.ofPattern("MMddyyyy"));
         String fileName = ".\\audits\\Audit_" + dateAsString + ".txt";
-        auditDao.writeAuditEntry(LocalDateTime.now() + " -- edited order number " + editedOrder.getOrderNumber() + " for "
-                + date.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")), fileName);
+        auditDao.writeAuditEntry(LocalDateTime.now() + " -- edited order number " + editedOrder.getOrderNumber(), fileName);
     }
 
     @Override
@@ -141,10 +181,10 @@ public class FlooringMasterServiceImpl implements FlooringMasteryService {
         // Writing audit entry.
         String dateAsString = date.format(DateTimeFormatter.ofPattern("MMddyyyy"));
         String fileName = ".\\audits\\Audit_" + dateAsString + ".txt";
-        auditDao.writeAuditEntry(LocalDateTime.now() + " -- removed order number " + orderToRemove.getOrderNumber() + " for "
-                + date.format(DateTimeFormatter.ofPattern("MM/dd/yyyy")), fileName);
+        auditDao.writeAuditEntry(LocalDateTime.now() + " -- removed order number " + orderToRemove.getOrderNumber(), fileName);
     }
 
+    @Override
     public void exportData() throws FlooringMasteryPersistenceException, NoOrdersOnDateException {
         dao.writeToExportFile();
     }
